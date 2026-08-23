@@ -1,0 +1,12 @@
+# core.autocrlf is on globally on Windows, which would rewrite every source
+# file to CRLF on the next checkout and show the whole tree as modified.
+# Pin everything to LF so the repo reads the same on any machine.
+* text=auto eol=lf
+
+# Already-compressed or signed; never transform these.
+*.mp3      binary
+*.m4a      binary
+*.apk      binary
+*.zip      binary
+*.keystore binary
+*.png      binary
