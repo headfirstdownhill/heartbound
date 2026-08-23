@@ -11,7 +11,7 @@ turn used in the letter.
 
 ## Playing it / putting it online
 
-**Live at <https://YOUR-USERNAME.github.io/heartbound/>.**
+**Live at <https://headfirstdownhill.github.io/heartbound/>.**
 
 That is the `index.html` + `js/` version, served by GitHub Pages straight out of
 this repo — there is no build step in front of it. Change something under `js/`,
