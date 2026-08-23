@@ -1,0 +1,12 @@
+# Android signing key - never commit to a public repo
+android/heartbound.keystore
+
+# Build outputs, regenerable from the .ps1 scripts
+heartbound-web.zip
+android/heartbound-apk.zip
+
+# Copied into place by android/build.ps1 (12 MB of duplicated audio).
+# assets/phaser.min.js is deliberately NOT ignored - it is vendored, and
+# android/build.ps1 hard-fails if it is missing.
+android/assets/*.mp3
+android/assets/heartbound.html

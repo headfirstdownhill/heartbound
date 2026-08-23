@@ -1,0 +1,10 @@
+{
+  "name": "Heartbound",
+  "short_name": "Heartbound",
+  "description": "A pixel adventure: chase the blobs, take back the heart, save him in time.",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "portrait",
+  "background_color": "#0d0b14",
+  "theme_color": "#0d0b14"
+}

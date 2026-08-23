@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d0b14">
+<title>Heartbound</title>
+<link rel="manifest" href="./manifest.json">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #0d0b14;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  #game-root { width: 100vw; height: 100vh; }
+  #game-root canvas { display: block; touch-action: none; image-rendering: pixelated; }
+  #boot-msg {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    color: #d94f70; font-family: monospace; font-size: 14px; letter-spacing: 2px; pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="game-root"></div>
+<div id="boot-msg">LOADING...</div>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>

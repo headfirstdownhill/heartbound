@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="backdrop">#0d0b14</color>
+
+    <!--
+      Full screen with no action bar, and the window painted the game's own
+      background so the launch window matches the page instead of flashing white
+      on the way in.
+    -->
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/backdrop</item>
+        <item name="android:colorBackground">@color/backdrop</item>
+        <item name="android:navigationBarColor">@color/backdrop</item>
+        <item name="android:statusBarColor">@color/backdrop</item>
+    </style>
+</resources>
