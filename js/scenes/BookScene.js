@@ -86,11 +86,11 @@ const PAGES = [
 // 'don't', a lowercase 'i' to 'I'. Nothing rephrased, nothing tidied, nothing
 // added.
 //
-// The faces are his too. '~' is the heart the font already had; '@' '#' '%'
-// '$' '&' '*' are the emoji he wrote, each drawn as a glyph in the font table
-// rather than dropped — see the note beside them there. One character here is
-// one face on the paper, so the runs he wrote at their full length still fit
-// the column.
+// The emoji are his too, and they are the real ones — '^' '@' '#' '%' '$' '&'
+// '*' are stand-ins that the page swaps for the actual character, drawn by
+// whatever emoji font the device has. See EMOJI below for why they cannot just
+// be typed in here. One stand-in is one emoji, so the runs he wrote survive at
+// the length he wrote them and still fit the column.
 const SCHOOL_PAGES = [
   "Hi my baby, I was thinking of giving this to you while you're sleeping, but since this message is related to your school, I don't want to send it to you while you're sleeping and let this be the first thing you read.",
 
@@ -100,7 +100,7 @@ const SCHOOL_PAGES = [
 
   "I know that it's been a while since you went to school that even writing with a pen or pencil might feel super weird.. like you might not even remember how to write or how your handwriting goes.",
 
-  "I know a lot can go through your head, but don't worry baby, that's completely normal and it happens because you're entering a new grade, look at you growing baby ~*",
+  "I know a lot can go through your head, but don't worry baby, that's completely normal and it happens because you're entering a new grade, look at you growing baby ^*",
 
   "I'm so proud of you! You've made it so far already in school despite all of those hard times, you did so much hard work baby to get to where you are now.",
 
@@ -108,7 +108,7 @@ const SCHOOL_PAGES = [
 
   "You're going to be anticipating a lot of things which is why you might feel anxious or nervous, and maybe you might feel a heavy heart, maybe you do right now, and that's okay baby, feel it.",
 
-  "Let your heart be heavy, that means your heart is alive and tender, just the way it should be sweetheart ~",
+  "Let your heart be heavy, that means your heart is alive and tender, just the way it should be sweetheart ^",
 
   "Don't think so hard about tomorrow okay? It's the first day, not much happens on the first day anyway baby, if anything, it's just like going to the mall and coming back home quick. So take it really easy baby.",
 
@@ -124,7 +124,7 @@ const SCHOOL_PAGES = [
 
   "Baby I'm so proud of you, I'm so so proud of you, you're doing amazing already and I can't wait to see how much more amazing you get when you're in school.",
 
-  "Working hard like a real student and being soo focused, IT'S SO CUTE I LOVE YOU ~~~~~~~~~~~",
+  "Working hard like a real student and being soo focused, IT'S SO CUTE I LOVE YOU ^^^^^^^^^^^",
 
   "And baby, if at all, your thoughts go out of control and you go into a spiral of thought, come to me right away, I'm your super cool psychologist with all the cures in the world ##",
 
@@ -136,11 +136,11 @@ const SCHOOL_PAGES = [
 
   "I love you my jellyfish! Spend time with your friends, make new friends and have a good time as much as you can in school.",
 
-  "And, whenever you can, bring a sweet treat to school, because you are my SUPER sweet sweetheart and because you deserve it baby @~",
+  "And, whenever you can, bring a sweet treat to school, because you are my SUPER sweet sweetheart and because you deserve it baby @^",
 
   "You've got this baby, wear your uniform and look SUPER CUTE, don't you ever think once it looks bad on you %%",
 
-  "Instead remind yourself that Tharuk (that's me by the way ##) loves, LOOOOOOVVVVVEEESS the way you look $$~&&~$~$~~",
+  "Instead remind yourself that Tharuk (that's me by the way ##) loves, LOOOOOOVVVVVEEESS the way you look $$^&&^$^$^^",
 
   "Oh baby, my heart is so FULL of you I love you so much, I'm so glad we've made it this far together, now keep pushing through baby, I'm right behind you to hold you,",
 
@@ -148,7 +148,7 @@ const SCHOOL_PAGES = [
 
   "I LOVE YOU BABY, I love you so much, you've got this, keep your heart free and firm, and if you ever need a second one to keep pushing, hold my heart too, next to yours, it's full of love, it'll get you through whatever you need",
 
-  "I love you Jory, I'm proud of you ~",
+  "I love you Jory, I'm proud of you ^",
 
   "I love you",
 ];
@@ -158,9 +158,52 @@ const SCHOOL_PAGES = [
 // are the same book twice, because they were given by the same person and one
 // of them looking like a different game's prop would say something neither of
 // them means.
+// The real emoji he wrote, keyed by the stand-in that sits in the page text.
+//
+// The emoji cannot go in the string itself. JavaScript measures and splits a
+// string by UTF-16 unit, so one emoji counts as two characters — the wrap would
+// drift, and the per-character glyph list the page is built from would no
+// longer line up with the text. A stand-in keeps that one-to-one: one character
+// in the page, one slot on the paper.
+//
+// None of these are in the font table, so each one sets a blank of exactly the
+// right width and the real emoji is drawn into it by the system font. That is
+// deliberate — they render in whatever she is reading on, which is the point.
+const EMOJI = {
+  '^': '❤️',
+  '@': '😁',
+  '#': '😎',
+  '%': '🤬',
+  '$': '🤤',
+  '&': '😉',
+  '*': '🥳',
+};
+// Whatever the device has. Every platform ships exactly one of these, so the
+// first that resolves is the native set; the last is there only so a machine
+// with none of them still measures something.
+const EMOJI_FONT =
+  '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
+// Sized to the slot, not to taste. A stand-in reserves one glyph advance — 13px
+// — and an emoji is about 1.37 times as wide as its font size, so 11px lands at
+// 15px and overhangs by a pixel a side. Anything larger stacks up visibly
+// across a long run: at 14px they are 19px wide and eat 3px of each neighbour.
+// It leaves them a shade shorter than the 14px letters, which is the right way
+// round — an emoji taller than the writing would read as a sticker on the page.
+const EMOJI_SIZE = 11;
+
 const BOOKS = {
-  beautiful: { title: 'For My Beautiful Jory', pages: PAGES },
-  schoolgirl: { title: 'For My Schoolgirl Jory', pages: SCHOOL_PAGES },
+  beautiful: {
+    title: 'For My Beautiful Jory',
+    pages: PAGES,
+    cover: 0xe8557f,
+    coverDark: 0xb83a5e,
+  },
+  schoolgirl: {
+    title: 'For My Schoolgirl Jory',
+    pages: SCHOOL_PAGES,
+    cover: 0x8e5bc4,
+    coverDark: 0x5f3690,
+  },
 };
 const DEFAULT_BOOK = 'beautiful';
 
@@ -179,8 +222,9 @@ const BOOK_EDGE = 4;
 const BOOK_FRAME = 8;
 const BOOK_SPINE_W = 26;
 const BOOK_GUTTER_W = 8;
-const BOOK_COVER = 0xe8557f;
-const BOOK_COVER_DARK = 0xb83a5e;
+// The two cover colours are the one thing the books do not share, so they live
+// on the book in BOOKS rather than here — everything else about the binding is
+// deliberately identical between them.
 // Two steps of shade where the paper turns into the binding, for the same
 // reason the speech bubbles grade their bevels over two: one hard band reads as
 // a drawn line, two read as a curve.
@@ -353,11 +397,14 @@ export class BookScene extends Phaser.Scene {
     //
     // Three across rather than two, so both books and the ring are all one tap
     // away. 480 wide will not carry three of the old 176-wide panels, so they
-    // come in to 140 with a 10px gap — which is also why the labels are two
-    // short words: at scale 1 a glyph advances 12px, so 11 characters is the
-    // most a panel can hold without the name running past its own edges.
-    this.reward(cx - 150, 292, 'book', 'A BOOK', 0, this.later(() => this.openBook('beautiful')));
-    this.reward(cx, 292, 'book', 'SCHOOL', 160, this.later(() => this.openBook('schoolgirl')));
+    // come in to 140 with a 10px gap.
+    //
+    // Numbered rather than named. Two books want telling apart at a glance more
+    // than they want describing, and the covers do the describing anyway — pink
+    // for the first, purple for the second, which is the same difference the
+    // icons carry here.
+    this.reward(cx - 150, 292, 'book', 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
+    this.reward(cx, 292, 'book2', 'BOOK 2', 160, this.later(() => this.openBook('schoolgirl')));
     this.reward(cx + 150, 292, 'ring', 'A RING', 320);
 
     const hint = new PixelText(this, cx, 418, '(TAP A BOOK TO READ IT)', {
@@ -502,10 +549,10 @@ export class BookScene extends Phaser.Scene {
     const y = Math.round(cy - BOOK_PAGE_H / 2) + inset;
     const h = BOOK_PAGE_H - inset * 2;
 
-    g.fillStyle(BOOK_COVER, 1);
+    g.fillStyle(this.book.cover, 1);
     g.fillRect(x, y, BOOK_SPINE_W, h);
 
-    g.fillStyle(BOOK_COVER_DARK, 1);
+    g.fillStyle(this.book.coverDark, 1);
     const bands = 4;
     for (let i = 1; i <= bands; i++) {
       g.fillRect(x, y + Math.round((h * i) / (bands + 1)) - 3, BOOK_SPINE_W, 6);
@@ -542,7 +589,7 @@ export class BookScene extends Phaser.Scene {
     const cy = 282;
 
     const board = this.add.graphics().setDepth(400);
-    drawChunkyPanel(board, cx, cy, BOOK_PAGE_W, BOOK_PAGE_H, BOOK_COVER, {});
+    drawChunkyPanel(board, cx, cy, BOOK_PAGE_W, BOOK_PAGE_H, this.book.cover, {});
     this.track(board);
 
     // The block of pages the cover is sitting on.
@@ -579,7 +626,7 @@ export class BookScene extends Phaser.Scene {
       // the title reads against the pink instead of floating on it.
       const shade = new PixelText(this, midX + 2, y + 3, line, {
         scale: 2,
-        color: BOOK_COVER_DARK,
+        color: this.book.coverDark,
         bold: true,
         maxWidth: BOOK_TEXT_W,
       });
@@ -619,6 +666,41 @@ export class BookScene extends Phaser.Scene {
     this.fadeIn(close, 700);
   }
 
+  // The real emoji, dropped into the blanks their stand-ins left behind.
+  //
+  // Drawn by the device's own font rather than out of the sprite sheet, so she
+  // gets the faces her phone draws — the ones he meant — instead of somebody's
+  // idea of them in five pixels.
+  //
+  // They go inside the line's own container, which is what makes this cheap:
+  // they inherit its position, its depth and its fade-in, and they are
+  // destroyed along with it when the page turns.
+  drawEmoji(text, line) {
+    for (let i = 0; i < line.length; i++) {
+      const glyph = EMOJI[line[i]];
+      if (!glyph) continue;
+      const slot = text.pool[i];
+      if (!slot) continue;
+      // The stand-in is a blank glyph drawn from its left edge, so the middle of
+      // the slot is half a glyph further along. Its scale is whatever PixelText
+      // settled on after fitting the line, which is not always the one asked
+      // for, so it is read back off the glyph rather than assumed.
+      const e = this.add
+        .text(slot.x + (text.glyphW * slot.scaleX) / 2, 0, glyph, {
+          fontFamily: EMOJI_FONT,
+          fontSize: `${EMOJI_SIZE}px`,
+          // Only reached if the device has no colour emoji at all and falls back
+          // to an outline: cream paper would swallow the default white.
+          color: '#241f2e',
+          // Colour emoji overhang the box the metrics promise, and Phaser crops
+          // to that box.
+          padding: { x: 3, y: 3 },
+        })
+        .setOrigin(0.5);
+      text.container.add(e);
+    }
+  }
+
   showPage(n) {
     this.page = Phaser.Math.Clamp(n, 0, this.pages.length - 1);
     this.clearView();
@@ -630,7 +712,7 @@ export class BookScene extends Phaser.Scene {
 
     const paper = this.add.graphics().setDepth(400);
     drawChunkyPanel(paper, cx, cy, BOOK_PAGE_W, BOOK_PAGE_H, BOOK_PAPER, {
-      frame: BOOK_COVER,
+      frame: this.book.cover,
       frameWidth: BOOK_FRAME,
     });
     this.track(paper);
@@ -659,6 +741,8 @@ export class BookScene extends Phaser.Scene {
       // safe because book pages are set once and never re-typed.
       const heart = line.indexOf('~');
       if (heart >= 0) t.pool[heart].setTint(0xff4d6d);
+
+      this.drawEmoji(t, line);
     });
 
     let y = cy + BOOK_PAGE_H / 2 + 46;

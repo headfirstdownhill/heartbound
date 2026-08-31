@@ -66,7 +66,14 @@ $parts = New-Object System.Collections.Generic.List[string]
 foreach ($rel in $order) {
   $path = Join-Path $Root $rel
   if (-not (Test-Path -LiteralPath $path)) { throw "missing $rel" }
-  $src = Get-Content -LiteralPath $path -Raw
+  # -Encoding UTF8 is not optional. Windows PowerShell reads as the system ANSI
+  # codepage otherwise, which turns every multi-byte character into mojibake on
+  # the way in and then writes that back out as valid UTF-8, so the damage is
+  # not recoverable by fixing the write. It went unnoticed while the only
+  # non-ASCII in the sources was em dashes inside comments, which are stripped
+  # below and never reached the bundle. The emoji in the school book are the
+  # first that live in the code itself.
+  $src = Get-Content -LiteralPath $path -Raw -Encoding UTF8
 
   # Strip module syntax: everything shares one scope once concatenated.
   $src = [regex]::Replace($src, "(?m)^\s*import[\s\S]*?from\s+'[^']*';\s*$", "")

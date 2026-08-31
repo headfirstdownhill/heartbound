@@ -53,26 +53,6 @@ const GLYPHS = {
   // hangs off '~' — an emoji here would render as a blank, since anything
   // outside this table falls back to a space.
   '~': ['ww.ww', 'wwwww', 'wwwww', 'wwwww', '.www.', '..w..', '.....'],
-
-  // The faces, for the school book, and hung off spare punctuation for exactly
-  // the reason the heart above is: the emoji themselves cannot be typed into a
-  // page. Not only are they missing from this table, JavaScript splits a string
-  // by UTF-16 unit, so a single emoji arrives as two broken halves and each one
-  // counts against the line width — the wrap would drift as well as the art.
-  // Writing '@' in a page and drawing it here keeps one character on the page
-  // meaning one glyph on the paper.
-  //
-  // Drawn solid rather than as outlines. At five pixels across, an outlined
-  // face spends four of them on its own edge and has one left for everything
-  // that makes it a face; filled, the features are cut out of it and read at a
-  // glance, which is also why the heart is solid.
-  '@': ['.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', 'wwwww', '.www.'], // grinning
-  '#': ['.www.', 'wwwww', '.....', 'wwwww', 'w...w', 'wwwww', '.www.'], // sunglasses
-  '%': ['.www.', 'w...w', 'wwwww', 'w.w.w', 'wwwww', 'w.w.w', '.www.'], // furious
-  '$': ['.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', 'w...w', '.www.'], // drooling
-  '&': ['.www.', 'wwwww', 'w.www', 'wwwww', 'w...w', 'wwwww', '.www.'], // winking
-  '*': ['..w..', '.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', '.www.'], // party hat
-
   ' ': ['.....', '.....', '.....', '.....', '.....', '.....', '.....'],
 };
 

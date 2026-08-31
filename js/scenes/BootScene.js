@@ -23,6 +23,7 @@ import {
   CHEST_CLOSED,
   CHEST_OPEN,
   BOOK,
+  BOOK_PURPLE,
   RING,
   RING_GARNET,
   BUBBLE_HEAL,
@@ -177,6 +178,7 @@ export class BootScene extends Phaser.Scene {
     makeTexture(this, 'chest_closed', CHEST_CLOSED, { pixelSize: PX });
     makeTexture(this, 'chest_open', CHEST_OPEN, { pixelSize: PX });
     makeTexture(this, 'book', BOOK, { pixelSize: PX });
+    makeTexture(this, 'book2', BOOK, { pixelSize: PX, overrides: BOOK_PURPLE });
     makeTexture(this, 'ring', RING, { pixelSize: PX, overrides: RING_GARNET });
     // One shell, four colours of glass — the same override trick the blob tiers
     // use, so the four bubbles cost one grid between them.

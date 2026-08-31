@@ -88,6 +88,17 @@ export const BOOK = [
   'oooooooooooooooo',
 ];
 
+// The second book, in purple. Only the boards change: 'd' and 'D' are the cover
+// and its shade, and they happen to be the dress colours, so overriding the two
+// of them repaints the binding and leaves the cream page edges, the white
+// plaque and the red heart exactly as they are. Tinting the sprite instead
+// would have dragged all four down together — a tint can only darken, and the
+// pink is lighter than the purple in two channels.
+export const BOOK_PURPLE = {
+  d: '#8e5bc4', // cover
+  D: '#5f3690', // cover shade
+};
+
 // The other thing in the chest. A brilliant-cut garnet over a gold band. The
 // facets step down through four tones so the stone has depth rather than
 // reading as a flat red lozenge, there is a glint on the table so it catches

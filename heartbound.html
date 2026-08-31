@@ -77,7 +77,7 @@ const FIST_DAMAGE = 3;
 // Nearly every sound in the game is synthesised at runtime, for the same reason
 // there are no image files: the game stays one HTML document you can
 // double-click or upload anywhere. The exceptions are the handful of recordings
-// in `audio/` next to it â€” three songs and the page turn.
+// in `audio/` next to it — three songs and the page turn.
 //
 // Three parts. `play()` is a table of one-shot effects built out of oscillators
 // and filtered noise, with `FILE_SFX` overriding individual entries where a
@@ -121,7 +121,7 @@ function chordNotes(chord) {
 
 // Melody lines are generated rather than written out, so a four-bar loop does
 // not audibly repeat every four bars. Seeded, so a track sounds the same each
-// time you hear it â€” a piece that re-rolled itself on every scene change would
+// time you hear it — a piece that re-rolled itself on every scene change would
 // stop being that room's music.
 function seededRandom(seed) {
   let s = (seed >>> 0) || 1;
@@ -187,7 +187,7 @@ const TRACKS = {
     melody: { gain: 0.1, octave: 12, density: 0.42, wave: 'square' },
   },
 
-  // The run back. Everything is won except the distance â€” pure forward motion.
+  // The run back. Everything is won except the distance — pure forward motion.
   chase: {
     bpm: 128,
     seed: 6644,
@@ -208,7 +208,7 @@ const TRACKS = {
     melody: { gain: 0.11, octave: 12, density: 0.4, wave: 'square' },
   },
 
-  // The rose meadow. No percussion at all â€” nothing is chasing anyone yet.
+  // The rose meadow. No percussion at all — nothing is chasing anyone yet.
   meadow: {
     bpm: 68,
     seed: 2211,
@@ -290,21 +290,21 @@ const TRACKS = {
 
 // Recorded music, as opposed to the synthesised pieces above. These are real
 // files on disk, so they live outside the Web Audio graph on plain <audio>
-// elements â€” `fetch` and `createMediaElementSource` both need an origin, and
+// elements — `fetch` and `createMediaElementSource` both need an origin, and
 // this game is meant to survive being double-clicked off a desktop and being
 // loaded from file:///android_asset inside the APK. The cost of that choice is
 // that mute, ducking and the pause hold have to be mirrored onto the element
 // by hand; `applyFileVolume` is where that happens.
 // Where the recordings live, and in what format. Both lines are rewritten by
 // `build-web-zip.ps1` when it packages a hosted build, and left alone otherwise
-// â€” so opening `heartbound.html` locally and running inside the apk both read
+// — so opening `heartbound.html` locally and running inside the apk both read
 // the full-quality masters sitting in `audio/`.
 //
 // AUDIO_BASE can be an absolute URL, which is how the game gets full-quality
 // audio onto a host with a small size cap: the files go somewhere without one
 // (GitHub Pages), and only the html is uploaded. Cross-origin works with no CORS
 // headers because these play on <audio> elements rather than through the Web
-// Audio graph â€” the same choice that keeps file:// working.
+// Audio graph — the same choice that keeps file:// working.
 const AUDIO_BASE = 'audio/';
 const AUDIO_EXT = 'mp3';
 
@@ -326,8 +326,8 @@ const FILE_TRACKS = {
   },
 };
 
-// Recorded one-shots. Same reasoning as the tracks above â€” element playback
-// rather than decoded buffers, so it survives file:// â€” but these are small
+// Recorded one-shots. Same reasoning as the tracks above — element playback
+// rather than decoded buffers, so it survives file:// — but these are small
 // enough to load up front, and each gets a few voices so turning pages quickly
 // overlaps instead of cutting itself off. A name here wins over the
 // synthesised effect of the same name, which stays as the fallback.
@@ -337,7 +337,7 @@ const FILE_SFX = {
 
 // The songs offered to the player, in order. Drives both the title screen's
 // strip and the garden's dropdown, so a track added here shows up in both. A
-// track can still exist in FILE_TRACKS without being on this list â€” that is how
+// track can still exist in FILE_TRACKS without being on this list — that is how
 // a piece stays tied to one scene instead of becoming a choice.
 const PLAYLIST = ['flowers', 'cornfield', 'loveletter'];
 
@@ -424,7 +424,7 @@ class AudioEngine {
   // anything else responding to the same gesture gets to go first. The tap that
   // unlocks audio is very often also the tap on the song list, and starting the
   // remembered track immediately means it plays for a tenth of a second and is
-  // then cross-faded out by the song the tap actually chose â€” two pieces of
+  // then cross-faded out by the song the tap actually chose — two pieces of
   // music briefly on top of each other, which is exactly what it sounds like.
   replayPending() {
     if (!this.pendingTrack) return;
@@ -691,7 +691,7 @@ class AudioEngine {
   // back up. Used by the boss phase changes, the nuke and the chest.
   duck(amount = 0.35, ms = 700) {
     // A recording ducks by moving its own volume, since it has no gain node.
-    // Down quickly, hold for the whole window, then back up â€” the same shape
+    // Down quickly, hold for the whole window, then back up — the same shape
     // the sequencer's gain ramp makes.
     if (this.el) {
       if (this.duckHold) window.clearTimeout(this.duckHold);
@@ -860,7 +860,7 @@ class AudioEngine {
     started?.catch((err) => {
       // Not every rejection means the browser refused us. Pausing an element
       // rejects its own still-pending play() with AbortError, and swapping
-      // tracks does exactly that â€” so treating it as "blocked, try later" would
+      // tracks does exactly that — so treating it as "blocked, try later" would
       // queue the outgoing song and drag it back over the new one at the next
       // tap. That is audible as the same track starting a second time on top of
       // itself, and it gets much easier to hit when the audio is coming from
@@ -933,9 +933,9 @@ class AudioEngine {
 
     // A recorded track already playing is left alone, so walking from the menu
     // into a level on the same song does not restart it. "Already playing" has
-    // to mean actually sounding, though: if the element ended up paused â€” a
+    // to mean actually sounding, though: if the element ended up paused — a
     // refused autoplay, or a fade that stopped it just as it was asked for
-    // again â€” then treating it as current would leave the game silent with no
+    // again — then treating it as current would leave the game silent with no
     // way back.
     if (FILE_TRACKS[name]) {
       if (this.fileName === name && this.el && !this.el.paused) return;
@@ -1036,7 +1036,7 @@ class AudioEngine {
     // it altogether, while the audio clock keeps running the whole time. Coming
     // back, `nextNoteTime` can be minutes in the past, and catching up one
     // sixteenth at a time would schedule thousands of notes in a single
-    // synchronous call â€” every one of them timestamped in the past, so they all
+    // synchronous call — every one of them timestamped in the past, so they all
     // fire at once. That is the freeze. Past a bar of drift, give up on the
     // missed notes and start again from now.
     if (this.nextNoteTime < now - spb * 16) {
@@ -1228,7 +1228,7 @@ function buildSfxTable() {
       this.noise({ dur: 0.09, gain: 0.3, type: 'lowpass', cutoff: 2400, cutoffTo: 300 });
       this.voice({ freq: 220, slideTo: 90, wave: 'square', dur: 0.09, gain: 0.14, cutoff: 900 });
     },
-    // Landing on a blob is wet, not metallic â€” that is the character of the
+    // Landing on a blob is wet, not metallic — that is the character of the
     // whole game's feedback.
     squelch({ pitch = 1 } = {}) {
       this.voice({ freq: 380 * pitch, slideTo: 120 * pitch, wave: 'sawtooth', dur: 0.14, gain: 0.13, cutoff: 1100, cutoffTo: 260 });
@@ -1385,7 +1385,7 @@ function buildSfxTable() {
       this.voice({ freq: 620 * pitch, wave: 'square', attack: 0.002, dur: 0.035, gain: 0.035, cutoff: 2600 });
     },
     // A sheet lifting, going over, and settling on the stack. One filtered
-    // burst is a snap, and paper does not snap â€” it needs the movement before
+    // burst is a snap, and paper does not snap — it needs the movement before
     // the event and the weight after it, so this is four overlapping rustles
     // with a little jitter so consecutive turns are never quite identical.
     page() {
@@ -1421,7 +1421,7 @@ function buildSfxTable() {
         });
       });
 
-      // The settle. Low and short â€” the page has weight and it lands.
+      // The settle. Low and short — the page has weight and it lands.
       this.noise({
         dur: 0.16,
         gain: 0.045,
@@ -1507,7 +1507,7 @@ const PALETTE = {
   B: '#2f5590', // boy shirt shade
   p: '#3c3a52', // trousers
   P: '#2a2839', // trousers shade
-  v: '#5a3a1e', // shoes â€” deliberately not the outline colour so feet read on dark floors
+  v: '#5a3a1e', // shoes — deliberately not the outline colour so feet read on dark floors
 
   m: '#dfe5ef', // blade
   M: '#9aa3b5', // blade shade
@@ -1559,8 +1559,8 @@ const PALETTE = {
 
   // Extra tile tones. The floors are the one thing on screen at every moment of
   // the game, and two shades apiece was never enough to make them read as
-  // ground rather than as noise â€” these give each surface a proper range.
-  4: '#63b354', // grass highlight â€” sunlit blade tips
+  // ground rather than as noise — these give each surface a proper range.
+  4: '#63b354', // grass highlight — sunlit blade tips
   5: '#24522a', // grass deep shadow
   6: '#8a6b52', // flagstone lit bevel
   7: '#3d2c20', // flagstone deep crack
@@ -1581,7 +1581,7 @@ const BLOB_TINTS = {
   boss: { g: '#b03a6a', G: '#6e1f42', l: '#e86a9a' },
   // Near-black crimson, so the final boss reads as a silhouette with lit eyes.
   final: { g: '#5c1030', G: '#33061a', l: '#9c2050' },
-  // Her allies. Not a tier anything spawns from â€” it exists so the summoned
+  // Her allies. Not a tier anything spawns from — it exists so the summoned
   // blobs get real blue art instead of a tint over a green one. Blue is the one
   // hue the horde never uses, so "blue means it is on your side" holds at a
   // glance even in a crowded room.
@@ -1694,7 +1694,7 @@ function pad(rows, top = 0, bottom = 0) {
   ];
 }
 
-// Rotate a grid 90 degrees clockwise â€” used for the fainted, lying-down boy.
+// Rotate a grid 90 degrees clockwise — used for the fainted, lying-down boy.
 function rotateCW(rows) {
   const h = rows.length;
   const w = rows[0].length;
@@ -1719,7 +1719,7 @@ function solidTexture(scene, key, w, h, color) {
 
 /* ---- js/gfx/FxTextures.js ---- */
 
-// Soft-edged textures â€” glows, sparks, smoke, light masks.
+// Soft-edged textures — glows, sparks, smoke, light masks.
 //
 // Everything under gfx/sprites/ is a grid of characters, which is exactly the
 // wrong tool for something that has to fade out at its edges. These are drawn
@@ -1765,7 +1765,7 @@ function radialTexture(scene, key, size, color = 0xffffff, opts = {}) {
   return linear(tex);
 }
 
-// A hollow ring that fades both inwards and outwards â€” shockwaves and the
+// A hollow ring that fades both inwards and outwards — shockwaves and the
 // boss's slam telegraph.
 function ringTexture(scene, key, size, color = 0xffffff, opts = {}) {
   const { thickness = 0.16, alpha = 1 } = opts;
@@ -1938,7 +1938,7 @@ function buildFxTextures(scene) {
 //
 // The class cannot be declared at the top level. The bundled build drops every
 // module into one shared scope and runs it immediately, and a canvas-only
-// browser has no `PostFXPipeline` to extend â€” `class X extends undefined` is a
+// browser has no `PostFXPipeline` to extend — `class X extends undefined` is a
 // hard error at load, which would take the whole game down rather than
 // gracefully dropping an effect. So it is built inside a function instead.
 
@@ -1981,8 +1981,8 @@ void main(void) {
   // for a phone and, on art this saturated, indistinguishable from a real
   // separable blur.
   // The threshold matters more than the strength. Too low and every ordinary
-  // white pixel in the art blooms â€” a field of white roses turns into a field
-  // of glowing orbs â€” so it sits high enough that only genuinely lit things
+  // white pixel in the art blooms — a field of white roses turns into a field
+  // of glowing orbs — so it sits high enough that only genuinely lit things
   // (glows, sparks, torches, flashes) get through.
   vec2 texel = 1.0 / uResolution;
   vec3 bloom = vec3(0.0);
@@ -2034,7 +2034,7 @@ void main(void) {
 // **To go back a step, change one word:** GRADE = 'soft' (or 'warm').
 //
 // `bloom` is 1 in all three on purpose. The glow is the part worth keeping, so
-// softening never touches it â€” if the glow itself ever needs easing, that is a
+// softening never touches it — if the glow itself ever needs easing, that is a
 // separate decision and this is where to make it.
 //
 // There is no colour-temperature uniform in this shader, so "warmer" is not a
@@ -2090,7 +2090,7 @@ const GRADES = {
     },
     bloom: 1,
     // Corners lightened a little, and the two most obviously "shader" artifacts
-    // â€” the colour fringing at the edges and the scanline banding â€” cut to
+    // — the colour fringing at the edges and the scanline banding — cut to
     // roughly half. Those are what read as an effect laid over the art; the
     // bloom is what reads as light in it.
     vignette: 0.85,
@@ -2182,7 +2182,7 @@ function applyPostFX(scene, preset = 'garden') {
   return pipe ?? null;
 }
 
-// Tween the whole look toward another preset â€” the level 3 boss waking up, or
+// Tween the whole look toward another preset — the level 3 boss waking up, or
 // the meadow draining out on the way to the arena.
 function gradePostFX(scene, preset, ms = 800) {
   const pipe = scene.postFX;
@@ -2250,29 +2250,9 @@ const GLYPHS = {
   '(': ['...w.', '..w..', '..w..', '..w..', '..w..', '..w..', '...w.'],
   ')': ['.w...', '..w..', '..w..', '..w..', '..w..', '..w..', '.w...'],
   // A heart, for the end of the book. There is no character for one, so it
-  // hangs off '~' â€” an emoji here would render as a blank, since anything
+  // hangs off '~' — an emoji here would render as a blank, since anything
   // outside this table falls back to a space.
   '~': ['ww.ww', 'wwwww', 'wwwww', 'wwwww', '.www.', '..w..', '.....'],
-
-  // The faces, for the school book, and hung off spare punctuation for exactly
-  // the reason the heart above is: the emoji themselves cannot be typed into a
-  // page. Not only are they missing from this table, JavaScript splits a string
-  // by UTF-16 unit, so a single emoji arrives as two broken halves and each one
-  // counts against the line width â€” the wrap would drift as well as the art.
-  // Writing '@' in a page and drawing it here keeps one character on the page
-  // meaning one glyph on the paper.
-  //
-  // Drawn solid rather than as outlines. At five pixels across, an outlined
-  // face spends four of them on its own edge and has one left for everything
-  // that makes it a face; filled, the features are cut out of it and read at a
-  // glance, which is also why the heart is solid.
-  '@': ['.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', 'wwwww', '.www.'], // grinning
-  '#': ['.www.', 'wwwww', '.....', 'wwwww', 'w...w', 'wwwww', '.www.'], // sunglasses
-  '%': ['.www.', 'w...w', 'wwwww', 'w.w.w', 'wwwww', 'w.w.w', '.www.'], // furious
-  '$': ['.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', 'w...w', '.www.'], // drooling
-  '&': ['.www.', 'wwwww', 'w.www', 'wwwww', 'w...w', 'wwwww', '.www.'], // winking
-  '*': ['..w..', '.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', '.www.'], // party hat
-
   ' ': ['.....', '.....', '.....', '.....', '.....', '.....', '.....'],
 };
 
@@ -2284,7 +2264,7 @@ const GLYPH_H = 7;
 
 // A real bold, thickened in the glyph grid rather than by drawing the text
 // twice at an offset. Faking it on screen needs a fractional scale to stay
-// small, and a fractional scale on a pixel font just turns to mush â€” this
+// small, and a fractional scale on a pixel font just turns to mush — this
 // stays on the pixel grid, so it renders crisp at scale 1.
 function embolden(rows) {
   return rows.map((row) => {
@@ -2308,7 +2288,7 @@ function upscale2x(rows) {
 }
 
 // Semi-bold, not bold. Thickening the 5x7 grid directly turns a 1-pixel stroke
-// into a 2-pixel one â€” that is double the weight and reads as bulky. Doubling
+// into a 2-pixel one — that is double the weight and reads as bulky. Doubling
 // the grid first makes the stroke 2 pixels, so the same thickening step lands
 // on 3: heavier than regular, well short of bold.
 const FONT_FRAMES_SEMI = FONT_FRAMES.map((frame) => embolden(upscale2x(frame)));
@@ -2323,7 +2303,7 @@ const FONT_PX = 2; // pixel size the regular font sheet was generated at
 const FONT_PX_SEMI = 1; // the semi-bold grid is already double scale
 
 // Each weight carries its own metrics, because the semi-bold sheet is drawn on
-// a doubled grid at half the pixel size â€” the two end up nearly the same size
+// a doubled grid at half the pixel size — the two end up nearly the same size
 // on screen, which is the point.
 const WEIGHTS = {
   regular: { key: FONT_KEY, gw: GLYPH_W, gh: GLYPH_H, px: FONT_PX, gap: 1 },
@@ -2448,7 +2428,7 @@ class SceneFx {
   // ---- emitter pool -------------------------------------------------------
 
   emitter(key, texture, config) {
-    // A looping scene timer can fire in the same frame the scene is torn down â€”
+    // A looping scene timer can fire in the same frame the scene is torn down —
     // the title screen's heart sparkle does exactly that on the way out. By
     // then the pool has been emptied, so without this we would ask Phaser for a
     // brand new emitter on a dying scene and it would throw from inside its own
@@ -2480,7 +2460,7 @@ class SceneFx {
     this.burst(x, y, { tint, scale: 0.55, duration: 160, alpha: 0.8 });
   }
 
-  // Wet, heavy, and it falls â€” the opposite of the sparks, on purpose, so a
+  // Wet, heavy, and it falls — the opposite of the sparks, on purpose, so a
   // blob coming apart never looks like metal.
   gooBurst(x, y, tint = 0x7ed957, count = 12) {
     const e = this.emitter('goo', 'fx_dot', {
@@ -2791,7 +2771,7 @@ class SceneFx {
     return this.lightRT;
   }
 
-  // `ref` is anything with live x/y â€” a sprite, a player, a plain point. There
+  // `ref` is anything with live x/y — a sprite, a player, a plain point. There
   // is no way to scale an erase, so the light sizes are the texture sizes.
   addLight(ref, opts = {}) {
     const { size = 256, flicker = false, offsetY = 0 } = opts;
@@ -3111,7 +3091,7 @@ const GIRL = {
     idle: [build(GIRL_HEAD_SIDE, GIRL_BODY_SIDE, LEGS_SIDE_IDLE)],
     walk: walkCycle(GIRL_HEAD_SIDE, GIRL_BODY_SIDE, LEGS_SIDE_A, LEGS_SIDE_B, LEGS_SIDE_IDLE),
   },
-  // Story-scene poses are drawn slimmer than the gameplay walk sprites â€” a
+  // Story-scene poses are drawn slimmer than the gameplay walk sprites — a
   // seated figure at the gameplay torso width reads as a blob.
   sit: [
     ...GIRL_HEAD_DOWN,
@@ -3516,7 +3496,7 @@ FINAL_IDLE.push(shiftDown(FINAL_IDLE[0], 1));
 const FINAL_EYES_OPEN = 'oggggrrggggggggggggrrggggggo';
 const FINAL_EYES_SHUT = 'oggggggggggggggggggggggggggo';
 
-// Eyes screwed shut, jaw thrown wide â€” the charge tell, same grammar as the
+// Eyes screwed shut, jaw thrown wide — the charge tell, same grammar as the
 // level 3 boss so anyone who has fought that one can read this one.
 const FINAL_WINDUP = [
   FINAL_IDLE[0].map((row) =>
@@ -3749,7 +3729,7 @@ const BASKET = [
   '..oooooooooo..',
 ];
 
-// Little "!" bubble for the girl's reaction beat â€” a beat of shock, not narration.
+// Little "!" bubble for the girl's reaction beat — a beat of shock, not narration.
 const SHOCK = [
   '..oooooooo..',
   '.owwwwwwwwo.',
@@ -3808,7 +3788,7 @@ function scatter(grid, rand, ch, n, onlyOver = null) {
 }
 
 // Soft round patch. Used for the clumps that break up flat grass and for the
-// leaf masses in a hedge â€” both look wrong as rectangles.
+// leaf masses in a hedge — both look wrong as rectangles.
 function blot(grid, cx, cy, r, ch) {
   for (let y = Math.max(0, Math.floor(cy - r)); y <= Math.min(SIZE - 1, Math.ceil(cy + r)); y++) {
     for (let x = Math.max(0, Math.floor(cx - r)); x <= Math.min(SIZE - 1, Math.ceil(cx + r)); x++) {
@@ -4110,7 +4090,7 @@ const CHEST_OPEN = [
 
 // 16x16, closed, seen face on. The first pass was a near-square cover with a
 // cream band under it, which reads as a box with a lid: nothing said which way
-// it opens. What makes it a book is depth on two sides at once â€” a dark spine
+// it opens. What makes it a book is depth on two sides at once — a dark spine
 // running down the left, and a block of page edges down the right and along the
 // bottom, so the cover clearly sits on top of a stack of paper. The banding on
 // the spine and the striations in the page block are what sell it at this size.
@@ -4136,6 +4116,17 @@ const BOOK = [
   'oDDQQQQQQQQQQQQo',
   'oooooooooooooooo',
 ];
+
+// The second book, in purple. Only the boards change: 'd' and 'D' are the cover
+// and its shade, and they happen to be the dress colours, so overriding the two
+// of them repaints the binding and leaves the cream page edges, the white
+// plaque and the red heart exactly as they are. Tinting the sprite instead
+// would have dragged all four down together — a tint can only darken, and the
+// pink is lighter than the purple in two channels.
+const BOOK_PURPLE = {
+  d: '#8e5bc4', // cover
+  D: '#5f3690', // cover shade
+};
 
 // The other thing in the chest. A brilliant-cut garnet over a gold band. The
 // facets step down through four tones so the stone has depth rather than
@@ -4164,7 +4155,7 @@ const RING = [
 // The stone's colours, as overrides on that grid. What separates a garnet from
 // a ruby is how dark it gets rather than how red it is, so the ramp runs from a
 // lit table down to a pavilion that is nearly black. Only the gem's characters
-// are remapped â€” the band is 'y'/'Y' and stays gold, which is what a red stone
+// are remapped — the band is 'y'/'Y' and stays gold, which is what a red stone
 // wants to sit in.
 const RING_GARNET = {
   m: '#ffd7dd', // glint on the table
@@ -4178,7 +4169,7 @@ const RING_GARNET = {
 // The first pass was a hollow white ring with a glyph floating in the middle,
 // which is the one thing in this game that did not look like it belonged in it:
 // no dark outline, no fill, no shading, and all four identical apart from the
-// glyph. These are glass orbs instead â€” outlined like every other sprite, lit
+// glyph. These are glass orbs instead — outlined like every other sprite, lit
 // down the top left, deepening toward the bottom right, with a specular arc on
 // the glass in front of whatever is suspended inside.
 //
@@ -4219,7 +4210,7 @@ function bubbleShell(icon) {
   );
 
   // Specular last, so it sits on the glass in front of the icon. An arc up the
-  // top-left rather than a couple of loose pixels â€” that is what makes it read
+  // top-left rather than a couple of loose pixels — that is what makes it read
   // as a sphere rather than a disc.
   for (let y = 0; y < BUBBLE_SIZE; y++) {
     for (let x = 0; x < BUBBLE_SIZE; x++) {
@@ -4364,7 +4355,7 @@ const ROSE_WHITE = [
 
 // Two looks for the meadow's animals, kept side by side so either can be put
 // back by changing one word. 'classic' is the original pair; 'plush' is the
-// rounder redraw â€” cats sitting with the tail swept out, otters chibi with a
+// rounder redraw — cats sitting with the tail swept out, otters chibi with a
 // pale muzzle.
 //
 // **To go back, change one word:** CRITTER_STYLE = 'classic'.
@@ -4411,7 +4402,7 @@ const CAT_B = [
 
 
 // The redraw: sitting rather than standing square-on, which is the pose in the
-// reference art. 17x15 â€” wider than the old grid because the tail now lies out
+// reference art. 17x15 — wider than the old grid because the tail now lies out
 // to the left along the ground instead of being tucked beside the body. Eyes
 // stay gold, not the reference's dark dots: on the black coat dark eyes vanish
 // into the silhouette entirely, which is what the gold was there to solve.
@@ -4434,7 +4425,7 @@ const CAT_SIT_A = [
   '.ooo..oGGooGGo...',
 ];
 
-// Second frame is the tail dropping and the head settling a pixel â€” a cat
+// Second frame is the tail dropping and the head settling a pixel — a cat
 // sitting still is not motionless, but it is not walking either.
 const CAT_SIT_B = [
   '.....o.......o...',
@@ -4467,7 +4458,7 @@ const CAT_COATS = {
 // lump are the whiskers poking past the cheeks, the open mouth with a tongue,
 // and ears set low on the sides instead of up on top.
 // Head-heavy and narrow through the body. The previous pass was as wide at the
-// belly as at the head with a full-width cream front, which reads as a panda â€”
+// belly as at the head with a full-width cream front, which reads as a panda —
 // the cream is now a slim bib with brown arms framing it.
 const OTTER_A = [
   '....oo......oo....',
@@ -4492,7 +4483,7 @@ const OTTER_A = [
 
 // One continuous run of hedge rather than separate clumps. Overlapping outlined
 // blobs read as a pile of rubble; a single mass with a gently scalloped top and
-// leaf speckle reads as a hedge. Only the top edge is outlined â€” the sides and
+// leaf speckle reads as a hedge. Only the top edge is outlined — the sides and
 // base are where it meets its neighbours and the ground.
 function hedgeBand(w, h = 22, seed = 3) {
   const grid = Array.from({ length: h }, () => Array.from({ length: w }, () => '.'));
@@ -4557,7 +4548,7 @@ const CAKE = [
 ];
 
 // Seen side-on, stacked. The first attempt was a cream triangle with the
-// filling buried inside it, which at this size read as a rice ball â€” bread has
+// filling buried inside it, which at this size read as a rice ball — bread has
 // to be its own colour with the filling banded between, and the lettuce has to
 // poke out past the bread for the shape to say "sandwich".
 // Sized to the cake's body (10x8 drawn, 20x16 on screen) so the two sit
@@ -4638,7 +4629,7 @@ const LILYPAD_BLOOM = [
 // The redraw, from the reference: rounder and top-heavy, with the pale muzzle
 // as a proper oval around the nose and mouth rather than the old thin bib, and
 // the paws brought together at the front. Same 18x18 box, so nothing that
-// positions an otter has to move. Whiskers still poke past the cheeks â€” at this
+// positions an otter has to move. Whiskers still poke past the cheeks — at this
 // size they are most of what separates an otter from a bear.
 const OTTER_PLUSH = [
   '.....oooooooo.....',
@@ -4744,7 +4735,7 @@ function shieldRing(size = 26) {
 /* ---- js/data/lookData.js ---- */
 
 // Everything the player can pick. Colours are palette overrides on the existing
-// grids â€” the same trick the blob tiers use â€” so only the shapes need new art.
+// grids — the same trick the blob tiers use — so only the shapes need new art.
 
 // ---- hair -----------------------------------------------------------------
 
@@ -4752,7 +4743,7 @@ function shieldRing(size = 26) {
 // sits INSIDE the head outline while the hair down the sides sits OUTSIDE it,
 // so the outline runs between them and they never join. Two masses that do not
 // connect to the hair on her head read as two ponytails, no matter how wide
-// they are. Row 2 here is a full-width bridge â€” the hair crosses the outline
+// they are. Row 2 here is a full-width bridge — the hair crosses the outline
 // once, at the crown, and everything below hangs off it as one curtain.
 // The head's own side outline is dropped on these rows and filled with hair
 // instead. That dark vertical pixel was splitting the outer fall from the hair
@@ -4969,11 +4960,11 @@ const GOWN_LEGS = {
 // Bare shoulders on the first row and a bare midriff at the waist are what
 // make the neckline read as off-shoulder at this size.
 // Full-length top: only the shoulders are bare, which is what carries the
-// off-shoulder neckline. Hips are held to the same width as the torso â€” the
+// off-shoulder neckline. Hips are held to the same width as the torso — the
 // first pass flared them to the dress's skirt width, which with wide legs
 // below gave her no waist at all.
 // Sleeves run down the first two rows and her hands come out at the cuff on
-// the third â€” the first pass made the whole arm sleeve-coloured and left her
+// the third — the first pass made the whole arm sleeve-coloured and left her
 // with no hands at all.
 const DENIM_FRONT = [
   '...osssssssso...',
@@ -5061,7 +5052,7 @@ const SKIN_TONES = [
 
 const EYE_COLORS = [
   { name: 'DARK', e: '#241f2e' },
-  // Hazel is the green-gold one, amber the copper one â€” at the first pass they
+  // Hazel is the green-gold one, amber the copper one — at the first pass they
   // were both mid-brown and read as the same swatch twice.
   { name: 'HAZEL', e: '#7d7038' },
   { name: 'BLUE', e: '#3a6ea8' },
@@ -5114,7 +5105,7 @@ function lookOverrides(look) {
 
 // Rebuilds every texture the player character appears in, from the chosen look.
 // Called once at boot with the defaults and again on each change in the
-// customiser â€” the texture keys never change, so everything downstream (player,
+// customiser — the texture keys never change, so everything downstream (player,
 // intros, endings) picks up the new art with no other wiring.
 const DIRS = ['down', 'up', 'side'];
 
@@ -5188,7 +5179,7 @@ const GameState = {
 
   // The one thing that outlives the session: whether the chest has ever been
   // opened. It is what puts the inventory on the title screen, so it has to
-  // survive the tab closing â€” otherwise she would have to win the book back
+  // survive the tab closing — otherwise she would have to win the book back
   // every time she wanted to read it, which is the whole thing the inventory
   // exists to avoid.
   chestOpened: false,
@@ -5220,7 +5211,7 @@ const GameState = {
     }
   },
 
-  // Deliberately leaves playerName and difficulty alone â€” this resets a run,
+  // Deliberately leaves playerName and difficulty alone — this resets a run,
   // not the session.
   reset() {
     this.hasSword = false;
@@ -5412,7 +5403,7 @@ class VirtualJoystick {
     this.base.setDepth(1000);
     this.knob.setDepth(1001);
 
-    // The whole lower-left quadrant grabs the stick, not just the drawn circle â€”
+    // The whole lower-left quadrant grabs the stick, not just the drawn circle —
     // thumbs rarely land exactly on target.
     this.zone = scene.add
       .zone(0, scene.scale.height - 300, scene.scale.width * 0.62, 300)
@@ -5531,7 +5522,7 @@ function shade(hex, factor) {
 }
 
 // Two overlapping rectangles make a plus shape, and a plus shape is a rectangle
-// with its four corner squares missing â€” the pixel-art rounded corner.
+// with its four corner squares missing — the pixel-art rounded corner.
 function plus(g, left, top, w, h, notch) {
   g.fillRect(left + notch, top, w - notch * 2, h);
   g.fillRect(left, top + notch, w, h - notch * 2);
@@ -5561,7 +5552,7 @@ function drawChunkyPanel(g, cx, cy, w, h, body, opts = {}) {
   let inW = w - edge * 2;
   let inH = h - edge * 2;
 
-  // Optional band between the outline and the face â€” the gold frame.
+  // Optional band between the outline and the face — the gold frame.
   if (frame !== null) {
     g.fillStyle(frame, 1);
     plus(g, inX, inY, inW, inH, notch);
@@ -5692,7 +5683,7 @@ class MenuButton {
     this.redraw();
   }
 
-  // Halo, shimmer and sparkles. Only the grand button gets these â€” it is the
+  // Halo, shimmer and sparkles. Only the grand button gets these — it is the
   // one that is meant to be for somebody.
   decorate(depth) {
     const scene = this.scene;
@@ -5908,7 +5899,7 @@ class SoundToggle {
   }
 }
 
-// Small square key for the name-entry keypad, in the same style but muted â€”
+// Small square key for the name-entry keypad, in the same style but muted —
 // thirty-odd bright yellow caps would shout down the rest of the screen.
 class KeyCap {
   constructor(scene, x, y, label, onPick, size = 40) {
@@ -5975,7 +5966,7 @@ class KeyCap {
 //
 // Titles are drawn at scale 1 and never shrunk to fit. Letting PixelText scale
 // a long name down lands on a fractional pixel size, which on a sheet this
-// small turns to mush â€” so anything too wide for the window scrolls instead,
+// small turns to mush — so anything too wide for the window scrolls instead,
 // which is what a real player of this size does anyway.
 const MINI_PANEL = 0x1d2b3a;
 const MINI_LABEL = 0xfff2c4;
@@ -6158,7 +6149,7 @@ class MiniPlayer {
 /* ---- js/ui/VolumeSlider.js ---- */
 
 // Speaker plus a track. The speaker is a mute toggle in its own right, so this
-// one control covers both "quieter" and "off" â€” which matters in the garden,
+// one control covers both "quieter" and "off" — which matters in the garden,
 // where there is no other way to shut the game up.
 const TRACK_BG = 0x1d2b3a;
 const TRACK_FILL = 0xffc20e;
@@ -6192,7 +6183,7 @@ class VolumeSlider {
       this.redraw();
     });
 
-    // The whole track is grabbable, and a tap anywhere on it jumps there â€”
+    // The whole track is grabbable, and a tap anywhere on it jumps there —
     // hunting for a small knob with a thumb is miserable.
     this.barHit = scene.add
       .zone((this.left + this.right) / 2, y, this.right - this.left + 16, 30)
@@ -6520,7 +6511,7 @@ function sbPlus(g, left, top, w, h, notch) {
 }
 
 class SpeechBubble {
-  // `tailX`/`tailY` is the point the tail reaches toward â€” the speaker's head.
+  // `tailX`/`tailY` is the point the tail reaches toward — the speaker's head.
   constructor(scene, cx, cy, text, opts = {}) {
     const { maxChars = 24, depth = 1500, tailX = cx, tailY = cy + 40, voicePitch = 1 } = opts;
 
@@ -6600,7 +6591,7 @@ class SpeechBubble {
     });
 
     // Stepped tail, drawn toward the speaker and always from the bubble's
-    // bottom edge â€” every speaker in this scene sits below their bubble.
+    // bottom edge — every speaker in this scene sits below their bubble.
     const dir = tailX < this.cx ? -1 : 1;
     const baseX = Math.round(this.cx + dir * Math.min(this.w / 2 - 22, 34));
     const baseY = top + this.h;
@@ -6677,7 +6668,7 @@ class SpeechBubble {
 
 /* ---- js/data/levelData.js ---- */
 
-// Rooms are 11x18 character maps and each one is a single screen â€” no scrolling,
+// Rooms are 11x18 character maps and each one is a single screen — no scrolling,
 // so the player can always see every blob they still have to kill.
 //   #  wall        .  floor       D  exit door
 //   P  player start   S  sword    Y  the boy (return run only)
@@ -6791,7 +6782,7 @@ const LEVELS = {
 // Speeds are about 15% off an earlier pass, which played too fast to get away
 // from. Worth knowing why it felt worse than the numbers looked: `dodge` adds
 // a sideways weave on top of the chase, so a tier actually closes at roughly
-// `speed * sqrt(1 + dodge^2)` â€” the orange tier was really moving at 125
+// `speed * sqrt(1 + dodge^2)` — the orange tier was really moving at 125
 // against the player's 155, which is not enough of a gap to break away in.
 // The boss is untouched; its speed only drives an idle drift, and the charge
 // it threatens with is timed separately in BossBlob.
@@ -6806,7 +6797,7 @@ const TIER_BY_CHAR = { 1: 'easy', 2: 'medium', 3: 'hard' };
 
 /* ---- js/data/joryData.js ---- */
 
-// One open arena, four pillars for cover, and a clear centre â€” the chest lands
+// One open arena, four pillars for cover, and a clear centre — the chest lands
 // there at the end, so nothing may ever be built on it.
 const JORY_ARENA = [
   '###########',
@@ -6962,7 +6953,7 @@ function buildRoom(scene, level) {
         body.refreshBody();
 
         // A torch every few tiles, on wall faces that the player can actually
-        // see â€” a light source buried inside a block of wall is wasted.
+        // see — a light source buried inside a block of wall is wasted.
         if (theme.torches && !isWall(row + 1, col) && row + 1 < rows && roll > 0.72) {
           torches.push({ x: ROOM_X + px + TILE / 2, y: ROOM_Y + py + TILE / 2 + 4 });
         }
@@ -7011,7 +7002,7 @@ class CutsceneDirector {
   }
 
   // `config` may be a function returning the config. Pass one whenever the
-  // targets do not exist yet at script-build time (anything spawned mid-scene) â€”
+  // targets do not exist yet at script-build time (anything spawned mid-scene) —
   // an object literal captures the targets array as it is right now.
   tween(config) {
     this.queue.push({ type: 'tween', config });
@@ -7166,7 +7157,7 @@ class Player {
     } else {
       const v = this.input.getMoveVector();
       const attacking = time < this.attackUntil;
-      // Swinging slows her rather than rooting her â€” mobile input feels dead if
+      // Swinging slows her rather than rooting her — mobile input feels dead if
       // the character stops responding mid-tap.
       const speed = attacking ? PLAYER_SPEED * 0.45 : PLAYER_SPEED;
       body.setVelocity(v.x * speed, v.y * speed);
@@ -7807,7 +7798,7 @@ class BossBlob extends Blob {
 // crowded room survivable, not clear the room for you.
 //
 // Names are GHOST_-prefixed because the single-file build drops every module
-// into one shared scope â€” a bare ATTACK_COOLDOWN_MS collides with Constants.js.
+// into one shared scope — a bare ATTACK_COOLDOWN_MS collides with Constants.js.
 const GHOST_FOLLOW_LAG = 0.055; // how quickly it closes on its resting spot
 const GHOST_CHASE_LAG = 0.085; // faster once it has picked a target
 const GHOST_REST_OFFSET = 34; // how far behind the girl it idles
@@ -7819,7 +7810,7 @@ const GHOST_ATTACK_COOLDOWN_MS = 1300;
 const GHOST_DAMAGE = 7;
 const GHOST_BOB_PX = 4;
 
-// Intangible on purpose â€” no physics body, no collisions, no health. It drifts
+// Intangible on purpose — no physics body, no collisions, no health. It drifts
 // through hedges and blobs ignore it entirely.
 // `opts` exists so the Jory run's allied blobs can reuse this whole
 // follow-and-strike behaviour with a different skin and a lifetime.
@@ -7977,7 +7968,7 @@ class GhostCompanion {
 //
 // 12 every 850ms each, so the four of them run at roughly 56 damage a second
 // against the 25 three of them used to manage. That is a real presence in a
-// crowd and still under the sword's 12 every 330ms â€” they help her win the
+// crowd and still under the sword's 12 every 330ms — they help her win the
 // room, they do not win it for her. Worth knowing when tuning: they will also
 // pick the final boss as a target, and its 360hp is about seven seconds of a
 // full set staying in contact with it.
@@ -8029,7 +8020,7 @@ class AlliedBlob extends GhostCompanion {
 /* ---- js/entities/FinalBoss.js ---- */
 
 // The thing waiting at the end of wave five. It keeps the level 3 boss's
-// readable rhythm â€” tell, commit, recover â€” but cycles three different
+// readable rhythm — tell, commit, recover — but cycles three different
 // commitments instead of one, and the gaps close as its health drops.
 const FB_WINDUP_MS = 700;
 const FB_LUNGE_MS = 460;
@@ -8063,7 +8054,7 @@ class FinalBoss extends Blob {
     this.glow = null;
 
     // The sprite is a near-black silhouette by design, so it needs its own light
-    // to exist at all in a lit room â€” and that light is also the telegraph.
+    // to exist at all in a lit room — and that light is also the telegraph.
     this.aura = scene.add
       .image(x, y, 'fx_glow')
       .setTint(0x9c2050)
@@ -8186,7 +8177,7 @@ class FinalBoss extends Blob {
     }
   }
 
-  // Charge, ring slam, charge, summon â€” a fixed rotation, so the fight can be
+  // Charge, ring slam, charge, summon — a fixed rotation, so the fight can be
   // learned. Summoning only starts once it is properly hurt.
   beginAttack(time) {
     const rotation = this.phase === 1 ? ['charge', 'slam'] : ['charge', 'slam', 'charge', 'summon'];
@@ -8550,8 +8541,9 @@ class BootScene extends Phaser.Scene {
     makeTexture(this, 'chest_closed', CHEST_CLOSED, { pixelSize: PX });
     makeTexture(this, 'chest_open', CHEST_OPEN, { pixelSize: PX });
     makeTexture(this, 'book', BOOK, { pixelSize: PX });
+    makeTexture(this, 'book2', BOOK, { pixelSize: PX, overrides: BOOK_PURPLE });
     makeTexture(this, 'ring', RING, { pixelSize: PX, overrides: RING_GARNET });
-    // One shell, four colours of glass â€” the same override trick the blob tiers
+    // One shell, four colours of glass — the same override trick the blob tiers
     // use, so the four bubbles cost one grid between them.
     [
       ['bubble_heal', BUBBLE_HEAL],
@@ -8734,7 +8726,7 @@ class MenuScene extends Phaser.Scene {
 
     // Always here, from the very first launch. The book and the ring are the
     // point of this, not a prize for getting through the waves, so they are not
-    // put behind the chest â€” she can open the letter without playing at all.
+    // put behind the chest — she can open the letter without playing at all.
     const inv = new MenuButton(this, cx, 738, 'INVENTORY', {
       scale: 2,
       minWidth: 240,
@@ -8801,13 +8793,13 @@ class MenuScene extends Phaser.Scene {
 
 /* ---- js/scenes/CustomizeScene.js ---- */
 
-// One column for labels, one for controls, and a band behind each row â€” the
+// One column for labels, one for controls, and a band behind each row — the
 // first pass left labels floating over the row above and everything ran together.
 const CZ_ROW_LABEL_X = 22;
 const CZ_ROW_TOP = 292;
 const CZ_ROW_STEP = 72;
 // Controls sit right of the longest label ("OUTFIT COLOUR", which ends at
-// x=176) â€” at the old centre its first swatch sat on top of the text.
+// x=176) — at the old centre its first swatch sat on top of the text.
 const CZ_CONTROL_CX = 312;
 // Sized so the longest row (nine outfit colours) still clears the labels.
 const CZ_SWATCH = 24;
@@ -8859,7 +8851,7 @@ class Swatch {
   }
 }
 
-// Her look, picked before the run. Always a girl â€” this is a gift for one.
+// Her look, picked before the run. Always a girl — this is a gift for one.
 class CustomizeScene extends Phaser.Scene {
   constructor() {
     super('Customize');
@@ -9149,7 +9141,7 @@ class DifficultyScene extends Phaser.Scene {
     const title = new PixelText(this, cx, 188, 'CHOOSE YOUR RUN', { scale: 3, color: 0xffffff });
     title.setDepth(600);
 
-    // Tharuk is the boy â€” a fixed character name, not the player's.
+    // Tharuk is the boy — a fixed character name, not the player's.
     this.buildOption(cx, 300, 'EASY', 0x7ed957, ["THARUK'S GHOST FIGHTS", 'ALONGSIDE YOU'], 'easy');
     this.buildOption(cx, 470, 'HARD', 0xff4d6d, ['NO GHOST.'], 'hard');
     // Deliberately unexplained, and deliberately the loudest thing on screen.
@@ -9269,7 +9261,7 @@ class IntroScene extends Phaser.Scene {
       alpha: 0.06,
     });
     applyPostFX(this, 'meadow');
-    // Silent by design â€” a custom track goes here.
+    // Silent by design — a custom track goes here.
     audio.stopMusic(600);
 
     this.cameras.main.fadeIn(700, 0, 0, 0);
@@ -9301,7 +9293,7 @@ class IntroScene extends Phaser.Scene {
   }
 
   spawnBlobs() {
-    // `recoil` is where each one backs off to after the theft â€” chosen so the
+    // `recoil` is where each one backs off to after the theft — chosen so the
     // floating heart, the fallen boy and the girl all stay unobstructed.
     const plan = [
       {
@@ -9479,7 +9471,7 @@ const JI_VIEW = {
   bottom: JI_FY + JI_VH / 2,
 };
 
-// 300ms lean in, 320ms held together, 300ms back â€” the heart lands on the end
+// 300ms lean in, 320ms held together, 300ms back — the heart lands on the end
 // of it. Shared by the story and the garden.
 const KISS_MS = 920;
 
@@ -9488,7 +9480,7 @@ const KISS_MS = 920;
 const WRAP = 20;
 const GATE_X = 240;
 
-// The "I love you Jory" opening. Nothing is stolen here â€” they talk, he gives
+// The "I love you Jory" opening. Nothing is stolen here — they talk, he gives
 // her a key, and she walks out through the gate under her own steam.
 //
 // The meadow, the pond, the cats and the kiss are all built here but none of
@@ -9556,7 +9548,7 @@ class JoryIntroScene extends Phaser.Scene {
       alpha: 0.075,
     });
     applyPostFX(this, 'meadow');
-    // Her song, not a generated one â€” this is the story, not a level.
+    // Her song, not a generated one — this is the story, not a level.
     audio.music('flowers');
 
     this.cameras.main.fadeIn(700, 0, 0, 0);
@@ -9566,7 +9558,7 @@ class JoryIntroScene extends Phaser.Scene {
   // ---- the three things the garden does differently -----------------------
 
   // This scene defines the mode, so it sets it rather than trusting whoever
-  // started it â€” the HUD keys its whole layout off this.
+  // started it — the HUD keys its whole layout off this.
   setupMode() {
     GameState.difficulty = 'jory';
   }
@@ -9587,7 +9579,7 @@ class JoryIntroScene extends Phaser.Scene {
     this.runScript();
   }
 
-  // A field of roses rather than the wild flowers of the other opening â€” red
+  // A field of roses rather than the wild flowers of the other opening — red
   // and white mixed, scattered deterministically so it never re-rolls.
   buildMeadow() {
     const rt = this.add.renderTexture(0, 0, GAME_W, GAME_H).setOrigin(0, 0).setDepth(-100);
@@ -9608,7 +9600,7 @@ class JoryIntroScene extends Phaser.Scene {
     this.add.image(-20, hedgeY, 'hedge_left').setOrigin(0, 0.5).setDepth(hedgeY);
     this.add.image(GATE_X + 30, hedgeY, 'hedge_right').setOrigin(0, 0.5).setDepth(hedgeY);
     this.gate = this.add.image(GATE_X, JI_VIEW.top + 18, 'door_locked').setDepth(JI_VIEW.top + 18);
-    // No scattered bushes out in the field â€” on open grass they read as stray
+    // No scattered bushes out in the field — on open grass they read as stray
     // green blobs rather than shrubs. The roses carry the meadow on their own.
   }
 
@@ -9904,7 +9896,7 @@ class JoryIntroScene extends Phaser.Scene {
     this.bubble?.destroy();
     GameState.reset();
     GameState.seenIntro = true;
-    // She is armed from the start here â€” there is no sword lying in the arena,
+    // She is armed from the start here — there is no sword lying in the arena,
     // and no time to go looking for one.
     GameState.hasSword = true;
     GameState.hasKey = true;
@@ -9939,7 +9931,7 @@ class HUDScene extends Phaser.Scene {
       .setDepth(879)
       .setScale(5, 0.4);
 
-    // The Jory run has no clock â€” the top right carries the wave count instead,
+    // The Jory run has no clock — the top right carries the wave count instead,
     // and the key he gave her sits beside the hearts.
     this.isJory = GameState.difficulty === 'jory';
 
@@ -9952,7 +9944,7 @@ class HUDScene extends Phaser.Scene {
       this.waveLabel.setDepth(900);
       this.onWave = (n, total) => this.setWave(n, total);
       this.game.events.on(EV_WAVE_CHANGED, this.onWave);
-      // Beside the hearts, not beside the wave label â€” the label grows leftwards
+      // Beside the hearts, not beside the wave label — the label grows leftwards
       // and would sit on top of it.
       this.keyIcon = this.add.image(124, 28, 'key').setDepth(900).setScale(1.1);
     } else {
@@ -10103,7 +10095,7 @@ class HUDScene extends Phaser.Scene {
     this.pauseView.forEach((o) => o.destroy());
     this.pauseView = [];
     runTimer.stop();
-    // The level is only paused, so it has to be stopped by hand â€” starting the
+    // The level is only paused, so it has to be stopped by hand — starting the
     // menu from here shuts down the HUD but nothing else.
     this.pausedLevel?.scene.stop();
     this.pausedLevel = null;
@@ -10218,7 +10210,7 @@ class BaseLevelScene extends Phaser.Scene {
   }
 
   // Overridable so a scene can supply its own room without having to register
-  // it in LEVELS â€” levelData cannot import the Jory arena back without making
+  // it in LEVELS — levelData cannot import the Jory arena back without making
   // the two modules circular, which the flat bundle would resolve to undefined.
   getLevel() {
     return LEVELS[this.levelKey];
@@ -10246,7 +10238,7 @@ class BaseLevelScene extends Phaser.Scene {
     input.bindKeyboard(this);
 
     // Before anything that might want to spawn a particle or hang a shadow off
-    // itself â€” which is every entity below.
+    // itself — which is every entity below.
     installFx(this);
     this.mood = ROOM_MOOD[level.theme] ?? ROOM_MOOD.dungeon;
     this.stepDustTint = this.mood.dust;
@@ -10539,7 +10531,7 @@ class BaseLevelScene extends Phaser.Scene {
     });
   }
 
-  // Running out of hearts costs time, not the run â€” the clock is the real threat.
+  // Running out of hearts costs time, not the run — the clock is the real threat.
   handlePlayerDown() {
     runTimer.penalize(DEATH_TIME_PENALTY_MS);
     this.cameras.main.flash(400, 200, 40, 60);
@@ -10777,7 +10769,7 @@ class ReturnScene extends BaseLevelScene {
     this.scene.get('HUD')?.showHint('PUT IT BACK', 2600);
   }
 
-  // The door here is the boy himself â€” no exit to unlock.
+  // The door here is the boy himself — no exit to unlock.
   onRoomCleared() {}
 
   onUpdate() {
@@ -10831,7 +10823,7 @@ const WAVE_GAP_MS = 2200;
 const BOSS_GAP_MS = 2600;
 
 // The whole "I love you Jory" run in one room: five waves, then the boss, then
-// the chest. No clock and no way to lose â€” the only exit is through.
+// the chest. No clock and no way to lose — the only exit is through.
 class JoryLevelScene extends BaseLevelScene {
   constructor() {
     super('JoryLevel', 'jory');
@@ -10984,7 +10976,7 @@ class JoryLevelScene extends BaseLevelScene {
     this.cameras.main.shake(700, 0.014);
     this.cameras.main.flash(400, 160, 30, 90);
 
-    // The room itself darkens around it â€” the arena stops being a place to
+    // The room itself darkens around it — the arena stops being a place to
     // fight in and becomes part of the thing you are fighting.
     gradePostFX(this, 'boss', 1400);
     this.fx.lightAlpha = 0.85;
@@ -11093,7 +11085,7 @@ class JoryLevelScene extends BaseLevelScene {
         break;
 
       case 'nuke': {
-        // The horde only â€” the boss is the fight, not part of the crowd.
+        // The horde only — the boss is the fight, not part of the crowd.
         const doomed = this.livingBlobs.filter((b) => b !== this.boss);
         this.cameras.main.flash(500, 255, 240, 180);
         this.cameras.main.shake(500, 0.02);
@@ -11288,7 +11280,7 @@ const FIRST_KISS_MS = 4000;
 
 // The same meadow as the "I love you Jory" opening with the script taken out:
 // the picnic, the pond, the cats, the weather and the two of them, and nothing
-// that asks anything of you. Everything on screen is built by JoryIntroScene â€”
+// that asks anything of you. Everything on screen is built by JoryIntroScene —
 // this only decides what happens once it is standing.
 class GardenScene extends JoryIntroScene {
   constructor() {
@@ -11300,7 +11292,7 @@ class GardenScene extends JoryIntroScene {
   // quietly rewrote the save would be a nasty surprise.
   setupMode() {}
 
-  // Same place the story puts its skip hint, and dimmer â€” there is no hurry to
+  // Same place the story puts its skip hint, and dimmer — there is no hurry to
   // leave, so it should sit quietly at the bottom of the meadow.
   //
   // The two controls are the only interface the garden has. The camera is
@@ -11348,7 +11340,7 @@ class GardenScene extends JoryIntroScene {
     });
   }
 
-  // No director and no HUD to shut down here, and nothing to hand off to â€”
+  // No director and no HUD to shut down here, and nothing to hand off to —
   // this goes back where it came from.
   finish() {
     if (this.done) return;
@@ -11364,18 +11356,18 @@ class GardenScene extends JoryIntroScene {
 
 /* ---- js/scenes/BookScene.js ---- */
 
-// What the book says, in order â€” one string per page.
+// What the book says, in order — one string per page.
 //
 // The words are his, kept exactly as written, bar one slip of the finger. Only
 // the breaks are a choice: they land on a sentence end wherever the writing
 // allowed it and on a clause where it did not, balanced so every page carries
 // about the same amount and none is crammed or left nearly bare. The only
 // thing here with no character behind it is the heart he signed off with,
-// which is why the last page ends on '~' â€” see the note in the font table.
+// which is why the last page ends on '~' — see the note in the font table.
 //
 // A string is a page. If one ever grows past what a sheet holds the reader
 // carries it on evenly, but these are already sized to fit, so what is written
-// here is what gets turned. Newlines are not honoured â€” start a new string.
+// here is what gets turned. Newlines are not honoured — start a new string.
 const PAGES = [
   "Hi my sweetheart Jory! I met you on 11th July, on the first hour of a new day. The most amazing girl to ever exist, the prettiest, the cutest, the most beautiful and the sweetest girl.",
 
@@ -11441,15 +11433,15 @@ const PAGES = [
 // The second book, written the night before she went back to school.
 //
 // Same rules as above: his words, his order, his line of thought. The only
-// changes are the ones a pen would have made anyway â€” 'im' to 'I'm', 'dont' to
+// changes are the ones a pen would have made anyway — 'im' to 'I'm', 'dont' to
 // 'don't', a lowercase 'i' to 'I'. Nothing rephrased, nothing tidied, nothing
 // added.
 //
-// The faces are his too. '~' is the heart the font already had; '@' '#' '%'
-// '$' '&' '*' are the emoji he wrote, each drawn as a glyph in the font table
-// rather than dropped â€” see the note beside them there. One character here is
-// one face on the paper, so the runs he wrote at their full length still fit
-// the column.
+// The emoji are his too, and they are the real ones — '^' '@' '#' '%' '$' '&'
+// '*' are stand-ins that the page swaps for the actual character, drawn by
+// whatever emoji font the device has. See EMOJI below for why they cannot just
+// be typed in here. One stand-in is one emoji, so the runs he wrote survive at
+// the length he wrote them and still fit the column.
 const SCHOOL_PAGES = [
   "Hi my baby, I was thinking of giving this to you while you're sleeping, but since this message is related to your school, I don't want to send it to you while you're sleeping and let this be the first thing you read.",
 
@@ -11459,7 +11451,7 @@ const SCHOOL_PAGES = [
 
   "I know that it's been a while since you went to school that even writing with a pen or pencil might feel super weird.. like you might not even remember how to write or how your handwriting goes.",
 
-  "I know a lot can go through your head, but don't worry baby, that's completely normal and it happens because you're entering a new grade, look at you growing baby ~*",
+  "I know a lot can go through your head, but don't worry baby, that's completely normal and it happens because you're entering a new grade, look at you growing baby ^*",
 
   "I'm so proud of you! You've made it so far already in school despite all of those hard times, you did so much hard work baby to get to where you are now.",
 
@@ -11467,7 +11459,7 @@ const SCHOOL_PAGES = [
 
   "You're going to be anticipating a lot of things which is why you might feel anxious or nervous, and maybe you might feel a heavy heart, maybe you do right now, and that's okay baby, feel it.",
 
-  "Let your heart be heavy, that means your heart is alive and tender, just the way it should be sweetheart ~",
+  "Let your heart be heavy, that means your heart is alive and tender, just the way it should be sweetheart ^",
 
   "Don't think so hard about tomorrow okay? It's the first day, not much happens on the first day anyway baby, if anything, it's just like going to the mall and coming back home quick. So take it really easy baby.",
 
@@ -11483,7 +11475,7 @@ const SCHOOL_PAGES = [
 
   "Baby I'm so proud of you, I'm so so proud of you, you're doing amazing already and I can't wait to see how much more amazing you get when you're in school.",
 
-  "Working hard like a real student and being soo focused, IT'S SO CUTE I LOVE YOU ~~~~~~~~~~~",
+  "Working hard like a real student and being soo focused, IT'S SO CUTE I LOVE YOU ^^^^^^^^^^^",
 
   "And baby, if at all, your thoughts go out of control and you go into a spiral of thought, come to me right away, I'm your super cool psychologist with all the cures in the world ##",
 
@@ -11495,11 +11487,11 @@ const SCHOOL_PAGES = [
 
   "I love you my jellyfish! Spend time with your friends, make new friends and have a good time as much as you can in school.",
 
-  "And, whenever you can, bring a sweet treat to school, because you are my SUPER sweet sweetheart and because you deserve it baby @~",
+  "And, whenever you can, bring a sweet treat to school, because you are my SUPER sweet sweetheart and because you deserve it baby @^",
 
   "You've got this baby, wear your uniform and look SUPER CUTE, don't you ever think once it looks bad on you %%",
 
-  "Instead remind yourself that Tharuk (that's me by the way ##) loves, LOOOOOOVVVVVEEESS the way you look $$~&&~$~$~~",
+  "Instead remind yourself that Tharuk (that's me by the way ##) loves, LOOOOOOVVVVVEEESS the way you look $$^&&^$^$^^",
 
   "Oh baby, my heart is so FULL of you I love you so much, I'm so glad we've made it this far together, now keep pushing through baby, I'm right behind you to hold you,",
 
@@ -11507,7 +11499,7 @@ const SCHOOL_PAGES = [
 
   "I LOVE YOU BABY, I love you so much, you've got this, keep your heart free and firm, and if you ever need a second one to keep pushing, hold my heart too, next to yours, it's full of love, it'll get you through whatever you need",
 
-  "I love you Jory, I'm proud of you ~",
+  "I love you Jory, I'm proud of you ^",
 
   "I love you",
 ];
@@ -11517,9 +11509,52 @@ const SCHOOL_PAGES = [
 // are the same book twice, because they were given by the same person and one
 // of them looking like a different game's prop would say something neither of
 // them means.
+// The real emoji he wrote, keyed by the stand-in that sits in the page text.
+//
+// The emoji cannot go in the string itself. JavaScript measures and splits a
+// string by UTF-16 unit, so one emoji counts as two characters — the wrap would
+// drift, and the per-character glyph list the page is built from would no
+// longer line up with the text. A stand-in keeps that one-to-one: one character
+// in the page, one slot on the paper.
+//
+// None of these are in the font table, so each one sets a blank of exactly the
+// right width and the real emoji is drawn into it by the system font. That is
+// deliberate — they render in whatever she is reading on, which is the point.
+const EMOJI = {
+  '^': '❤️',
+  '@': '😁',
+  '#': '😎',
+  '%': '🤬',
+  '$': '🤤',
+  '&': '😉',
+  '*': '🥳',
+};
+// Whatever the device has. Every platform ships exactly one of these, so the
+// first that resolves is the native set; the last is there only so a machine
+// with none of them still measures something.
+const EMOJI_FONT =
+  '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
+// Sized to the slot, not to taste. A stand-in reserves one glyph advance — 13px
+// — and an emoji is about 1.37 times as wide as its font size, so 11px lands at
+// 15px and overhangs by a pixel a side. Anything larger stacks up visibly
+// across a long run: at 14px they are 19px wide and eat 3px of each neighbour.
+// It leaves them a shade shorter than the 14px letters, which is the right way
+// round — an emoji taller than the writing would read as a sticker on the page.
+const EMOJI_SIZE = 11;
+
 const BOOKS = {
-  beautiful: { title: 'For My Beautiful Jory', pages: PAGES },
-  schoolgirl: { title: 'For My Schoolgirl Jory', pages: SCHOOL_PAGES },
+  beautiful: {
+    title: 'For My Beautiful Jory',
+    pages: PAGES,
+    cover: 0xe8557f,
+    coverDark: 0xb83a5e,
+  },
+  schoolgirl: {
+    title: 'For My Schoolgirl Jory',
+    pages: SCHOOL_PAGES,
+    cover: 0x8e5bc4,
+    coverDark: 0x5f3690,
+  },
 };
 const DEFAULT_BOOK = 'beautiful';
 
@@ -11538,8 +11573,9 @@ const BOOK_EDGE = 4;
 const BOOK_FRAME = 8;
 const BOOK_SPINE_W = 26;
 const BOOK_GUTTER_W = 8;
-const BOOK_COVER = 0xe8557f;
-const BOOK_COVER_DARK = 0xb83a5e;
+// The two cover colours are the one thing the books do not share, so they live
+// on the book in BOOKS rather than here — everything else about the binding is
+// deliberately identical between them.
 // Two steps of shade where the paper turns into the binding, for the same
 // reason the speech bubbles grade their bevels over two: one hard band reads as
 // a drawn line, two read as a curve.
@@ -11568,13 +11604,13 @@ const BOOK_INK = 0x241f2e;
 const BOOK_PAPER = 0xf6f2e8;
 
 // One reward panel. Three of them and their gaps have to live inside 480, which
-// is what sets the width â€” the height is unchanged, so the row sits exactly
+// is what sets the width — the height is unchanged, so the row sits exactly
 // where the pair used to.
 const REWARD_W = 140;
 const REWARD_H = 196;
 
 // What she gets for opening it: the rewards laid out side by side, and then the
-// book itself if she wants to read it. Both views live in this one scene â€”
+// book itself if she wants to read it. Both views live in this one scene —
 // they are the same moment, and a second scene for the pages would mean the
 // writing lived somewhere other than the file the rest of the book is in.
 class BookScene extends Phaser.Scene {
@@ -11583,7 +11619,7 @@ class BookScene extends Phaser.Scene {
   }
 
   // Doubles as the inventory. Arriving from the title screen changes only the
-  // framing â€” the same things, the same books â€” so there is one place the
+  // framing — the same things, the same books — so there is one place the
   // rewards live rather than a second screen to keep in step with this one.
   create(data) {
     this.fromMenu = data?.from === 'menu';
@@ -11665,7 +11701,7 @@ class BookScene extends Phaser.Scene {
 
   // Driven through setAlpha rather than by tweening `alpha` directly, because a
   // MenuButton is a plain class over half a dozen loose objects, not a
-  // GameObject â€” tweening its `alpha` sets a property nothing reads, and the
+  // GameObject — tweening its `alpha` sets a property nothing reads, and the
   // button stays on the initial 0 forever.
   fadeIn(target, delay) {
     target.setAlpha(0);
@@ -11712,11 +11748,14 @@ class BookScene extends Phaser.Scene {
     //
     // Three across rather than two, so both books and the ring are all one tap
     // away. 480 wide will not carry three of the old 176-wide panels, so they
-    // come in to 140 with a 10px gap â€” which is also why the labels are two
-    // short words: at scale 1 a glyph advances 12px, so 11 characters is the
-    // most a panel can hold without the name running past its own edges.
-    this.reward(cx - 150, 292, 'book', 'A BOOK', 0, this.later(() => this.openBook('beautiful')));
-    this.reward(cx, 292, 'book', 'SCHOOL', 160, this.later(() => this.openBook('schoolgirl')));
+    // come in to 140 with a 10px gap.
+    //
+    // Numbered rather than named. Two books want telling apart at a glance more
+    // than they want describing, and the covers do the describing anyway — pink
+    // for the first, purple for the second, which is the same difference the
+    // icons carry here.
+    this.reward(cx - 150, 292, 'book', 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
+    this.reward(cx, 292, 'book2', 'BOOK 2', 160, this.later(() => this.openBook('schoolgirl')));
     this.reward(cx + 150, 292, 'ring', 'A RING', 320);
 
     const hint = new PixelText(this, cx, 418, '(TAP A BOOK TO READ IT)', {
@@ -11738,7 +11777,7 @@ class BookScene extends Phaser.Scene {
     });
 
     if (this.fromMenu) {
-      // Nothing to play again from here â€” she came to look at them, not to win
+      // Nothing to play again from here — she came to look at them, not to win
       // them, so there is one way out and it goes back where she came from.
       const back = new MenuButton(this, cx, 600, 'BACK', {
         scale: 3,
@@ -11839,7 +11878,7 @@ class BookScene extends Phaser.Scene {
   // Every page in the book is set at the same size. An earlier version grew the
   // text on short pages so they filled the sheet, which made a page of few
   // words shout at the reader next to its neighbours. A book is one typeface at
-  // one size all the way through, and the words carry their own weight â€” a page
+  // one size all the way through, and the words carry their own weight — a page
   // with little on it is a pause, not a headline.
   wrapPage(text) {
     return wrapText(text, BOOK_CHARS_PER_LINE);
@@ -11850,7 +11889,7 @@ class BookScene extends Phaser.Scene {
   // shade on the paper beside it so the sheet looks like it turns into the
   // binding rather than being butted up against a stripe.
   //
-  // Whole-pixel rectangles only, no gradients â€” this has to sit in the same
+  // Whole-pixel rectangles only, no gradients — this has to sit in the same
   // world as the sprites, and a smooth ramp here would read as a different game.
   // `gutter` is the shading on the paper beside the spine. The front board has
   // no paper to curve, so it asks for the binding without it.
@@ -11861,10 +11900,10 @@ class BookScene extends Phaser.Scene {
     const y = Math.round(cy - BOOK_PAGE_H / 2) + inset;
     const h = BOOK_PAGE_H - inset * 2;
 
-    g.fillStyle(BOOK_COVER, 1);
+    g.fillStyle(this.book.cover, 1);
     g.fillRect(x, y, BOOK_SPINE_W, h);
 
-    g.fillStyle(BOOK_COVER_DARK, 1);
+    g.fillStyle(this.book.coverDark, 1);
     const bands = 4;
     for (let i = 1; i <= bands; i++) {
       g.fillRect(x, y + Math.round((h * i) / (bands + 1)) - 3, BOOK_SPINE_W, 6);
@@ -11901,7 +11940,7 @@ class BookScene extends Phaser.Scene {
     const cy = 282;
 
     const board = this.add.graphics().setDepth(400);
-    drawChunkyPanel(board, cx, cy, BOOK_PAGE_W, BOOK_PAGE_H, BOOK_COVER, {});
+    drawChunkyPanel(board, cx, cy, BOOK_PAGE_W, BOOK_PAGE_H, this.book.cover, {});
     this.track(board);
 
     // The block of pages the cover is sitting on.
@@ -11938,7 +11977,7 @@ class BookScene extends Phaser.Scene {
       // the title reads against the pink instead of floating on it.
       const shade = new PixelText(this, midX + 2, y + 3, line, {
         scale: 2,
-        color: BOOK_COVER_DARK,
+        color: this.book.coverDark,
         bold: true,
         maxWidth: BOOK_TEXT_W,
       });
@@ -11962,7 +12001,7 @@ class BookScene extends Phaser.Scene {
       new MenuButton(this, cx + 132, y, '>', {
         scale: 2,
         padX: 16,
-        // Opening the book is a page turn like any other â€” same rule.
+        // Opening the book is a page turn like any other — same rule.
         clickSound: null,
         onPick: this.later(() => this.turnTo(0)),
       }),
@@ -11978,6 +12017,41 @@ class BookScene extends Phaser.Scene {
     this.fadeIn(close, 700);
   }
 
+  // The real emoji, dropped into the blanks their stand-ins left behind.
+  //
+  // Drawn by the device's own font rather than out of the sprite sheet, so she
+  // gets the faces her phone draws — the ones he meant — instead of somebody's
+  // idea of them in five pixels.
+  //
+  // They go inside the line's own container, which is what makes this cheap:
+  // they inherit its position, its depth and its fade-in, and they are
+  // destroyed along with it when the page turns.
+  drawEmoji(text, line) {
+    for (let i = 0; i < line.length; i++) {
+      const glyph = EMOJI[line[i]];
+      if (!glyph) continue;
+      const slot = text.pool[i];
+      if (!slot) continue;
+      // The stand-in is a blank glyph drawn from its left edge, so the middle of
+      // the slot is half a glyph further along. Its scale is whatever PixelText
+      // settled on after fitting the line, which is not always the one asked
+      // for, so it is read back off the glyph rather than assumed.
+      const e = this.add
+        .text(slot.x + (text.glyphW * slot.scaleX) / 2, 0, glyph, {
+          fontFamily: EMOJI_FONT,
+          fontSize: `${EMOJI_SIZE}px`,
+          // Only reached if the device has no colour emoji at all and falls back
+          // to an outline: cream paper would swallow the default white.
+          color: '#241f2e',
+          // Colour emoji overhang the box the metrics promise, and Phaser crops
+          // to that box.
+          padding: { x: 3, y: 3 },
+        })
+        .setOrigin(0.5);
+      text.container.add(e);
+    }
+  }
+
   showPage(n) {
     this.page = Phaser.Math.Clamp(n, 0, this.pages.length - 1);
     this.clearView();
@@ -11989,7 +12063,7 @@ class BookScene extends Phaser.Scene {
 
     const paper = this.add.graphics().setDepth(400);
     drawChunkyPanel(paper, cx, cy, BOOK_PAGE_W, BOOK_PAGE_H, BOOK_PAPER, {
-      frame: BOOK_COVER,
+      frame: this.book.cover,
       frameWidth: BOOK_FRAME,
     });
     this.track(paper);
@@ -12014,10 +12088,12 @@ class BookScene extends Phaser.Scene {
       this.fadeIn(t.container, 160 + i * 110);
 
       // The heart he signed off with, in red. PixelText tints a whole string at
-      // once, so this reaches for the single glyph that should not be ink â€”
+      // once, so this reaches for the single glyph that should not be ink —
       // safe because book pages are set once and never re-typed.
       const heart = line.indexOf('~');
       if (heart >= 0) t.pool[heart].setTint(0xff4d6d);
+
+      this.drawEmoji(t, line);
     });
 
     let y = cy + BOOK_PAGE_H / 2 + 46;
