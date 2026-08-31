@@ -183,13 +183,16 @@ const EMOJI = {
 // with none of them still measures something.
 const EMOJI_FONT =
   '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
-// Sized to the slot, not to taste. A stand-in reserves one glyph advance — 13px
-// — and an emoji is about 1.37 times as wide as its font size, so 11px lands at
-// 15px and overhangs by a pixel a side. Anything larger stacks up visibly
-// across a long run: at 14px they are 19px wide and eat 3px of each neighbour.
-// It leaves them a shade shorter than the 14px letters, which is the right way
-// round — an emoji taller than the writing would read as a sticker on the page.
-const EMOJI_SIZE = 11;
+// The blank that widens a stand-in to two slots, and the stand-ins themselves.
+// See widenEmoji for why the filler is not a space.
+const EMOJI_PAD = '_';
+const EMOJI_KEYS = /[\^@#%$&*]/g;
+// Sized to the pair of slots it now owns. Two advances is 26px, and an emoji is
+// about 1.37 times as wide as its font size, so 18px lands at 25px and sits
+// inside its own space. The artwork inside an emoji does not fill its box, so
+// this draws at roughly the height of the 14px letters rather than towering
+// over them — one slot could only carry 11px, which read as tiny beside them.
+const EMOJI_SIZE = 18;
 
 const BOOKS = {
   beautiful: {
@@ -530,7 +533,22 @@ export class BookScene extends Phaser.Scene {
   // one size all the way through, and the words carry their own weight — a page
   // with little on it is a pause, not a headline.
   wrapPage(text) {
-    return wrapText(text, BOOK_CHARS_PER_LINE);
+    return wrapText(this.widenEmoji(text), BOOK_CHARS_PER_LINE);
+  }
+
+  // Gives every emoji a second slot to sit in.
+  //
+  // A letter is 11px in a 13px advance, and emoji artwork does not fill its own
+  // box — at a size that fits one slot the drawing inside comes out visibly
+  // smaller than the writing next to it. Two slots is 26px, which is room for
+  // an emoji at a size that matches the text.
+  //
+  // The filler is '_' rather than a space on purpose. wrapText breaks on
+  // whitespace, and a space here would let a run of eleven hearts wrap in the
+  // middle of itself. '_' has no glyph, so it sets an empty slot exactly like a
+  // space would, but the wrapper reads the run as one unbreakable word.
+  widenEmoji(text) {
+    return text.replace(EMOJI_KEYS, (c) => `${c}${EMOJI_PAD}`);
   }
 
   // The spine down the gutter: a band in the cover colour, crossed by the same
@@ -681,12 +699,15 @@ export class BookScene extends Phaser.Scene {
       if (!glyph) continue;
       const slot = text.pool[i];
       if (!slot) continue;
-      // The stand-in is a blank glyph drawn from its left edge, so the middle of
-      // the slot is half a glyph further along. Its scale is whatever PixelText
-      // settled on after fitting the line, which is not always the one asked
-      // for, so it is read back off the glyph rather than assumed.
+      // Stand-ins are widened to two slots before wrapping, so the emoji is
+      // centred across this blank and the filler after it. Glyphs are drawn
+      // from their left edge, so the middle of the pair is the far slot's left
+      // edge plus half a glyph. Falls back to the single slot if the filler is
+      // missing, which only happens if a page is written by hand without one.
+      const pair = text.pool[i + 1] && line[i + 1] === EMOJI_PAD ? text.pool[i + 1] : slot;
+      const mid = (slot.x + pair.x) / 2 + (text.glyphW * slot.scaleX) / 2;
       const e = this.add
-        .text(slot.x + (text.glyphW * slot.scaleX) / 2, 0, glyph, {
+        .text(mid, 0, glyph, {
           fontFamily: EMOJI_FONT,
           fontSize: `${EMOJI_SIZE}px`,
           // Only reached if the device has no colour emoji at all and falls back
