@@ -1,5 +1,4 @@
 import { GAME_W, GAME_H } from '../core/Constants.js';
-import { GameState } from '../core/GameState.js';
 import { PixelText } from '../gfx/PixelText.js';
 import { MenuButton, meadowBackdrop, SoundToggle } from '../ui/MenuWidgets.js';
 import { MiniPlayer } from '../ui/MiniPlayer.js';
@@ -118,27 +117,25 @@ export class MenuScene extends Phaser.Scene {
       onPick: () => this.openGarden(),
     });
 
-    // Only appears once the chest has actually been opened. A locked button
-    // sitting there from the first launch would give away that there is
-    // something in the Jory run to find.
-    if (GameState.chestOpened) {
-      const inv = new MenuButton(this, cx, 738, 'INVENTORY', {
-        scale: 2,
-        minWidth: 240,
-        color: 0xe0559a,
-        onPick: () => this.openInventory(),
-      });
-      inv.setAlpha(0);
-      const fade = { a: 0 };
-      this.tweens.add({
-        targets: fade,
-        a: 1,
-        duration: 500,
-        delay: 700,
-        onUpdate: () => inv.setAlpha(fade.a),
-        onComplete: () => inv.setAlpha(1),
-      });
-    }
+    // Always here, from the very first launch. The book and the ring are the
+    // point of this, not a prize for getting through the waves, so they are not
+    // put behind the chest — she can open the letter without playing at all.
+    const inv = new MenuButton(this, cx, 738, 'INVENTORY', {
+      scale: 2,
+      minWidth: 240,
+      color: 0xe0559a,
+      onPick: () => this.openInventory(),
+    });
+    inv.setAlpha(0);
+    const fade = { a: 0 };
+    this.tweens.add({
+      targets: fade,
+      a: 1,
+      duration: 500,
+      delay: 700,
+      onUpdate: () => inv.setAlpha(fade.a),
+      onComplete: () => inv.setAlpha(1),
+    });
 
     // The one place sound can be turned off. It is remembered across sessions,
     // and it is on the title screen rather than buried in the pause menu
