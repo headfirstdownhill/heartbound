@@ -2253,6 +2253,26 @@ const GLYPHS = {
   // hangs off '~' â€” an emoji here would render as a blank, since anything
   // outside this table falls back to a space.
   '~': ['ww.ww', 'wwwww', 'wwwww', 'wwwww', '.www.', '..w..', '.....'],
+
+  // The faces, for the school book, and hung off spare punctuation for exactly
+  // the reason the heart above is: the emoji themselves cannot be typed into a
+  // page. Not only are they missing from this table, JavaScript splits a string
+  // by UTF-16 unit, so a single emoji arrives as two broken halves and each one
+  // counts against the line width â€” the wrap would drift as well as the art.
+  // Writing '@' in a page and drawing it here keeps one character on the page
+  // meaning one glyph on the paper.
+  //
+  // Drawn solid rather than as outlines. At five pixels across, an outlined
+  // face spends four of them on its own edge and has one left for everything
+  // that makes it a face; filled, the features are cut out of it and read at a
+  // glance, which is also why the heart is solid.
+  '@': ['.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', 'wwwww', '.www.'], // grinning
+  '#': ['.www.', 'wwwww', '.....', 'wwwww', 'w...w', 'wwwww', '.www.'], // sunglasses
+  '%': ['.www.', 'w...w', 'wwwww', 'w.w.w', 'wwwww', 'w.w.w', '.www.'], // furious
+  '$': ['.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', 'w...w', '.www.'], // drooling
+  '&': ['.www.', 'wwwww', 'w.www', 'wwwww', 'w...w', 'wwwww', '.www.'], // winking
+  '*': ['..w..', '.www.', 'wwwww', 'w.w.w', 'wwwww', 'w...w', '.www.'], // party hat
+
   ' ': ['.....', '.....', '.....', '.....', '.....', '.....', '.....'],
 };
 
@@ -11418,6 +11438,91 @@ const PAGES = [
   "I love you Jory, my pretty girl ~",
 ];
 
+// The second book, written the night before she went back to school.
+//
+// Same rules as above: his words, his order, his line of thought. The only
+// changes are the ones a pen would have made anyway â€” 'im' to 'I'm', 'dont' to
+// 'don't', a lowercase 'i' to 'I'. Nothing rephrased, nothing tidied, nothing
+// added.
+//
+// The faces are his too. '~' is the heart the font already had; '@' '#' '%'
+// '$' '&' '*' are the emoji he wrote, each drawn as a glyph in the font table
+// rather than dropped â€” see the note beside them there. One character here is
+// one face on the paper, so the runs he wrote at their full length still fit
+// the column.
+const SCHOOL_PAGES = [
+  "Hi my baby, I was thinking of giving this to you while you're sleeping, but since this message is related to your school, I don't want to send it to you while you're sleeping and let this be the first thing you read.",
+
+  "I know how much the school stuff stresses you out or bothers you. So since you have school tomorrow, I know today you'll think of it and maybe stress out or feel really anxious or nervous, so I'll send this message to you when today you feel that way @@",
+
+  "I love you, that's the first thing I want you to know sweetheart. I love you so dearly, so deeply, and so so much baby.",
+
+  "I know that it's been a while since you went to school that even writing with a pen or pencil might feel super weird.. like you might not even remember how to write or how your handwriting goes.",
+
+  "I know a lot can go through your head, but don't worry baby, that's completely normal and it happens because you're entering a new grade, look at you growing baby ~*",
+
+  "I'm so proud of you! You've made it so far already in school despite all of those hard times, you did so much hard work baby to get to where you are now.",
+
+  "If I'm this proud, your parents must be even more proud of you baby.",
+
+  "You're going to be anticipating a lot of things which is why you might feel anxious or nervous, and maybe you might feel a heavy heart, maybe you do right now, and that's okay baby, feel it.",
+
+  "Let your heart be heavy, that means your heart is alive and tender, just the way it should be sweetheart ~",
+
+  "Don't think so hard about tomorrow okay? It's the first day, not much happens on the first day anyway baby, if anything, it's just like going to the mall and coming back home quick. So take it really easy baby.",
+
+  "And if somehow your teachers are super evil %% and they give you homework, come and give it to me immediately, I will help you SOLVE IT while you freshen up and get all dressed into new comfortable clothes,",
+
+  "into your pretty black top and comfortable pyjamas, and then you better eat and drink plenty of water.",
+
+  "I don't want you to at all be stressed out about us, I'm really understanding about all of this baby I promise. I've been through all the feelings you are feeling with school and your last year, and I want you to enjoy it as much as you can.",
+
+  "Of course, since we met each other, your school days will be different, your days back at home will be different, and they'll be different for the better.",
+
+  "So don't worry about us baby, don't worry about me. I'll be right here waiting for you, my beautiful princess to come back to me whenever she wants to and whenever she needs me.",
+
+  "Baby I'm so proud of you, I'm so so proud of you, you're doing amazing already and I can't wait to see how much more amazing you get when you're in school.",
+
+  "Working hard like a real student and being soo focused, IT'S SO CUTE I LOVE YOU ~~~~~~~~~~~",
+
+  "And baby, if at all, your thoughts go out of control and you go into a spiral of thought, come to me right away, I'm your super cool psychologist with all the cures in the world ##",
+
+  "But I really mean it baby, come to me okay? I'll take care of you, I'll get you all in shape and ready.",
+
+  "When everything outside gets too much, come and stay inside with me, in my heart, and let me take care of you till you're ready to step out again.",
+
+  "No matter what baby, I'll be right behind you. Come right back to me if it gets too noisy, too difficult, too stressful or too much to handle at all.",
+
+  "I love you my jellyfish! Spend time with your friends, make new friends and have a good time as much as you can in school.",
+
+  "And, whenever you can, bring a sweet treat to school, because you are my SUPER sweet sweetheart and because you deserve it baby @~",
+
+  "You've got this baby, wear your uniform and look SUPER CUTE, don't you ever think once it looks bad on you %%",
+
+  "Instead remind yourself that Tharuk (that's me by the way ##) loves, LOOOOOOVVVVVEEESS the way you look $$~&&~$~$~~",
+
+  "Oh baby, my heart is so FULL of you I love you so much, I'm so glad we've made it this far together, now keep pushing through baby, I'm right behind you to hold you,",
+
+  "you won't have to go through any of this alone, you won't have to ghost anyone, I'll keep your heart light, you'll be my angel, my beautiful girl, my amazing hard working schoolgirl!",
+
+  "I LOVE YOU BABY, I love you so much, you've got this, keep your heart free and firm, and if you ever need a second one to keep pushing, hold my heart too, next to yours, it's full of love, it'll get you through whatever you need",
+
+  "I love you Jory, I'm proud of you ~",
+
+  "I love you",
+];
+
+// The books on the shelf, keyed by what the inventory passes in. Everything
+// that differs between them lives here; the boards, the binding and the paper
+// are the same book twice, because they were given by the same person and one
+// of them looking like a different game's prop would say something neither of
+// them means.
+const BOOKS = {
+  beautiful: { title: 'For My Beautiful Jory', pages: PAGES },
+  schoolgirl: { title: 'For My Schoolgirl Jory', pages: SCHOOL_PAGES },
+};
+const DEFAULT_BOOK = 'beautiful';
+
 // A fixed portrait page. The first pass sized the paper to its text, which for
 // one short line came out wider than it was tall and read as a landscape card
 // rather than a book. So the page is a fixed shape and the text is fitted into
@@ -11440,9 +11545,8 @@ const BOOK_COVER_DARK = 0xb83a5e;
 // a drawn line, two read as a curve.
 const BOOK_GUTTER_NEAR = 0xdcd4bf;
 const BOOK_GUTTER_FAR = 0xeae4d5;
-// What is written on the front board, and where it breaks. Wrapped rather than
-// hand-split so the title can be changed without also re-laying it out.
-const BOOK_TITLE = 'For My Beautiful Jory';
+// Where the title breaks on the front board. Wrapped rather than hand-split, so
+// a second book with a longer name lays itself out without being measured.
 const BOOK_TITLE_WRAP = 10;
 // The page edges showing past the boards down the fore edge and along the foot.
 const BOOK_BLOCK_W = 14;
@@ -11463,8 +11567,14 @@ const BOOK_CHARS_PER_LINE = Math.floor(
 const BOOK_INK = 0x241f2e;
 const BOOK_PAPER = 0xf6f2e8;
 
-// What she gets for opening it: the two rewards laid out side by side, and then
-// the book itself if she wants to read it. Both views live in this one scene â€”
+// One reward panel. Three of them and their gaps have to live inside 480, which
+// is what sets the width â€” the height is unchanged, so the row sits exactly
+// where the pair used to.
+const REWARD_W = 140;
+const REWARD_H = 196;
+
+// What she gets for opening it: the rewards laid out side by side, and then the
+// book itself if she wants to read it. Both views live in this one scene â€”
 // they are the same moment, and a second scene for the pages would mean the
 // writing lived somewhere other than the file the rest of the book is in.
 class BookScene extends Phaser.Scene {
@@ -11473,12 +11583,14 @@ class BookScene extends Phaser.Scene {
   }
 
   // Doubles as the inventory. Arriving from the title screen changes only the
-  // framing â€” the same two things, the same book â€” so there is one place the
+  // framing â€” the same things, the same books â€” so there is one place the
   // rewards live rather than a second screen to keep in step with this one.
   create(data) {
     this.fromMenu = data?.from === 'menu';
     this.page = 0;
-    this.pages = this.buildPages();
+    // Which book is open. Set before a cover is drawn and left alone after, so
+    // closing one and opening the other is a change of this and a redraw.
+    this.bookId = DEFAULT_BOOK;
     // Phaser reuses this instance for the life of the page, so the view list
     // has to be emptied on entry as well as between views.
     this.view = [];
@@ -11499,10 +11611,23 @@ class BookScene extends Phaser.Scene {
   // short enough is left alone; anything longer than a page is carried onto as
   // many as it needs. The point is that whoever is writing can just write, and
   // never has to think about where a page ends or count characters.
+  // The book currently open, and the sheets it has been laid out onto. Built on
+  // the way in to a cover rather than up front, so the book she never opens is
+  // never wrapped.
+  openBook(id) {
+    this.bookId = BOOKS[id] ? id : DEFAULT_BOOK;
+    this.pages = this.buildPages();
+    this.showCover();
+  }
+
+  get book() {
+    return BOOKS[this.bookId] ?? BOOKS[DEFAULT_BOOK];
+  }
+
   buildPages() {
     const maxLines = Math.floor(BOOK_TEXT_H / (BOOK_LINE_H * BOOK_SCALE));
     const out = [];
-    PAGES.forEach((text) => {
+    this.book.pages.forEach((text) => {
       const lines = this.wrapPage(text);
       if (lines.length <= maxLines) {
         out.push(lines);
@@ -11580,13 +11705,21 @@ class BookScene extends Phaser.Scene {
     this.track(who.setDepth(600));
     this.fadeIn(who.container, 300);
 
-    // The book is the thing you press. A button saying so would sit between her
-    // and the reward it is describing; pressing the book itself is the shorter
-    // route, and the ring stays inert so only one panel ever lights up.
-    this.reward(cx - 106, 292, 'book', 'A BOOK', 0, this.later(() => this.showCover()));
-    this.reward(cx + 106, 292, 'ring', 'A RING', 200);
+    // The books are the things you press. A button saying so would sit between
+    // her and the reward it is describing; pressing the book itself is the
+    // shorter route, and the ring stays inert so only the readable things light
+    // up.
+    //
+    // Three across rather than two, so both books and the ring are all one tap
+    // away. 480 wide will not carry three of the old 176-wide panels, so they
+    // come in to 140 with a 10px gap â€” which is also why the labels are two
+    // short words: at scale 1 a glyph advances 12px, so 11 characters is the
+    // most a panel can hold without the name running past its own edges.
+    this.reward(cx - 150, 292, 'book', 'A BOOK', 0, this.later(() => this.openBook('beautiful')));
+    this.reward(cx, 292, 'book', 'SCHOOL', 160, this.later(() => this.openBook('schoolgirl')));
+    this.reward(cx + 150, 292, 'ring', 'A RING', 320);
 
-    const hint = new PixelText(this, cx, 418, '(HINT: TAP ON THE BOOK)', {
+    const hint = new PixelText(this, cx, 418, '(TAP A BOOK TO READ IT)', {
       scale: 1,
       color: 0x9a94b0,
     });
@@ -11638,7 +11771,8 @@ class BookScene extends Phaser.Scene {
   // thing marking one of the two out as something to do rather than just have.
   reward(cx, cy, texture, label, delay, onPick = null) {
     const panel = this.add.graphics().setDepth(400);
-    const paint = (lit) => drawChunkyPanel(panel, cx, cy, 176, 196, lit ? 0x342b45 : 0x1b1622, {});
+    const paint = (lit) =>
+      drawChunkyPanel(panel, cx, cy, REWARD_W, REWARD_H, lit ? 0x342b45 : 0x1b1622, {});
     paint(false);
     this.track(panel);
 
@@ -11648,7 +11782,7 @@ class BookScene extends Phaser.Scene {
       // count as a tap.
       let held = false;
       const zone = this.add
-        .zone(cx, cy, 176, 196)
+        .zone(cx, cy, REWARD_W, REWARD_H)
         .setDepth(404)
         .setInteractive({ useHandCursor: true });
       zone.on('pointerover', () => paint(true));
@@ -11669,7 +11803,7 @@ class BookScene extends Phaser.Scene {
       this.track(zone);
     }
 
-    const halo = this.add.ellipse(cx, cy + 56, 104, 26, 0x8f6bb0, 0.5).setDepth(401);
+    const halo = this.add.ellipse(cx, cy + 56, 84, 24, 0x8f6bb0, 0.5).setDepth(401);
     this.track(halo);
     this.tweens.add({
       targets: halo,
@@ -11798,7 +11932,7 @@ class BookScene extends Phaser.Scene {
     const emblem = this.add.image(midX, cy - 84, 'heart').setDepth(404).setScale(3);
     this.track(emblem);
 
-    wrapText(BOOK_TITLE, BOOK_TITLE_WRAP).forEach((line, i) => {
+    wrapText(this.book.title, BOOK_TITLE_WRAP).forEach((line, i) => {
       const y = cy + 58 + i * 42;
       // Stamped rather than printed: a dark offset behind cream lettering, so
       // the title reads against the pink instead of floating on it.
