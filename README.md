@@ -142,25 +142,37 @@ kiss, and she walks out through the gate. The rest is one arena.
   of it, and the run ends on a screen showing the two of them as hers, with the
   book offered to read.
 
-Opening the chest is remembered for good, in `localStorage`. From then on the
-title screen carries an **INVENTORY** button that opens the same screen, so the
-book can be read again without fighting back through the waves for it. The
-button is hidden until the chest has actually been opened — a locked one sitting
-there from the first launch would give away that there is something to find.
-Storage being refused (private windows, some `file://` setups) costs only the
-inventory; the game plays normally.
+Opening the chest is still remembered in `localStorage`, but nothing is gated on
+it any more: the title screen carries an **INVENTORY** button from the very
+first launch. The books are the point of the thing rather than a prize for
+getting through the waves, so the letters can be read without playing at all.
 
-Tapping the book opens its front board — pink, titled, with the heart on it —
-and the arrow turns from there into the letter. Thirty pages, all set at one
-size, with the page turns balanced so no page is crammed and none is left bare.
+Inside are three panels — **BOOK 1**, **BOOK 2** and the ring. The ring is
+there to be had, not pressed; the books open. Tapping one opens its front board,
+titled, with the heart on it, and the arrow turns from there into the letter.
+Book 1 is pink, book 2 purple, and they are otherwise the same book twice —
+same binding, same paper, same page turn — because they came from the same
+person. Thirty pages each, all set at one size, with the page turns balanced so
+no page is crammed and none is left bare.
 
-Both are data at the top of `js/scenes/BookScene.js`: `BOOK_TITLE` is what the
-cover says, and `PAGES` is the letter, one string per page. A string marks where
-a page starts; if one ever outgrows a sheet the reader carries it on evenly by
-itself. The font is uppercase-only and covers `A-Z 0-9 . , ! ? : - / ' ( ) < >`
-plus `~`, which draws a heart — anything outside that set renders as a blank
-space rather than erroring, so check new punctuation against the table in
+The writing is data at the top of `js/scenes/BookScene.js`. `BOOKS` holds the
+two of them, each with its title, its pages and its cover colours; `PAGES` and
+`SCHOOL_PAGES` are the letters, one string per page. A string marks where a page
+starts; if one ever outgrows a sheet the reader carries it on evenly by itself.
+
+The font is uppercase-only and covers `A-Z 0-9 . , ! ? : - / ' ( ) < >` plus
+`~`, which draws a heart. Anything outside that set renders as a blank space
+rather than erroring, so check new punctuation against the table in
 `js/gfx/sprites/font.js`.
+
+Emoji are the exception, and they are real ones drawn by the reader's own
+device. They cannot be typed into a page directly — JavaScript measures and
+splits a string by UTF-16 unit, so one emoji counts as two characters and both
+the wrap and the per-character glyph list drift. Instead a page holds a
+one-character stand-in from the `EMOJI` map (`^ @ # % $ & *`), which has no
+glyph and so reserves an exact blank, and the real character is drawn into it.
+`widenEmoji` gives each one a second slot before wrapping so it has room to be
+read at the size of the writing.
 
 
 ## The garden

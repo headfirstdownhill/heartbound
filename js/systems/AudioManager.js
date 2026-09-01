@@ -362,9 +362,34 @@ export class AudioEngine {
     }, 0);
   }
 
+  // Any state that is not 'running' is a stopped clock, and there is more than
+  // one of them.
+  //
+  // 'suspended' is the one every browser starts in before a gesture. Safari has
+  // a second, 'interrupted', which it uses when the audio session is taken
+  // away — the screen locking, a call, another app, or an <audio> element
+  // pausing and handing the session back. Only checking for 'suspended' left
+  // that case stuck forever, and because everything except the three
+  // recordings is synthesised, stuck means the whole game goes quiet: music and
+  // every effect at once. The recordings kept playing, since they are on
+  // elements outside this graph, so the sound appeared to come back by itself
+  // the moment a scene asked for one.
+  //
+  // resume() rejects if it is called without a gesture behind it, which is not
+  // a failure worth reporting — the next tap calls this again.
+  resumeIfNeeded() {
+    if (!this.ctx || this.ctx.state === 'running') return;
+    // Retrying every scheduler tick would be a resume call every 25ms for as
+    // long as the interruption lasts.
+    const now = Date.now();
+    if (now - (this.lastResumeTry ?? 0) < 500) return;
+    this.lastResumeTry = now;
+    this.ctx.resume?.().catch(() => {});
+  }
+
   unlock() {
     if (this.ready) {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
+      this.resumeIfNeeded();
       // A recording whose autoplay was refused earlier gets another go now
       // that there has certainly been a gesture.
       this.replayPending();
@@ -411,7 +436,7 @@ export class AudioEngine {
     this.sfxGain.connect(this.master);
 
     this.ready = true;
-    if (ctx.state === 'suspended') ctx.resume();
+    this.resumeIfNeeded();
     // A track asked for before the first tap is remembered and starts here.
     this.replayPending();
   }
@@ -599,6 +624,10 @@ export class AudioEngine {
 
   play(name, opts = {}) {
     if (!this.ready || this.muted) return;
+    // The sequencer's watchdog only ticks while there is music. A screen with
+    // effects and no track — the menus, or a piece that has faded out — would
+    // otherwise stay mute until something started singing.
+    this.resumeIfNeeded();
     // A recording wins over the synthesised effect of the same name, and the
     // synth stays as the fallback for when the file could not be loaded.
     if (FILE_SFX[name] && this.playFileSfx(name)) return;
@@ -951,6 +980,11 @@ export class AudioEngine {
 
   schedule() {
     if (!this.track || this.muted) return;
+    // The sequencer is the one thing already ticking whenever there is music,
+    // which makes it the cheapest place to notice the clock has stopped and ask
+    // for it back. Without this the game waits for a tap, and the arena is
+    // played with a thumb on a joystick that does not always produce one.
+    this.resumeIfNeeded();
     const spb = 60 / this.track.bpm / 4; // one sixteenth
     // Read the clock once. Re-reading it inside the loop means a slow call can
     // move the finish line further away every time round.
@@ -1402,4 +1436,10 @@ if (typeof window !== 'undefined') {
   ['pointerdown', 'keydown'].forEach((ev) =>
     window.addEventListener(ev, unlockAudio, { passive: true }),
   );
+  // Coming back to the tab, or unlocking the phone, is the moment an
+  // interrupted context can be revived — and it is not a gesture, so nothing
+  // above fires for it.
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) audio.resumeIfNeeded();
+  });
 }
