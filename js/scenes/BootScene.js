@@ -24,6 +24,10 @@ import {
   CHEST_OPEN,
   BOOK,
   BOOK_PURPLE,
+  LETTER_CLOSED,
+  LETTER_OPEN,
+  LETTER_CARD,
+  LETTER_INK,
   RING,
   RING_GARNET,
   BUBBLE_HEAL,
@@ -179,6 +183,12 @@ export class BootScene extends Phaser.Scene {
     makeTexture(this, 'chest_open', CHEST_OPEN, { pixelSize: PX });
     makeTexture(this, 'book', BOOK, { pixelSize: PX });
     makeTexture(this, 'book2', BOOK, { pixelSize: PX, overrides: BOOK_PURPLE });
+    // The letter is drawn on a 24x24 grid where everything else here is 16x16.
+    // It is scaled down where it is used rather than up, so it sits level with
+    // the books on the shelf and spends its extra pixels on shading.
+    makeTexture(this, 'letter_closed', LETTER_CLOSED, { pixelSize: PX, overrides: LETTER_INK });
+    makeTexture(this, 'letter_open', LETTER_OPEN, { pixelSize: PX, overrides: LETTER_INK });
+    makeTexture(this, 'letter_card', LETTER_CARD, { pixelSize: PX, overrides: LETTER_INK });
     makeTexture(this, 'ring', RING, { pixelSize: PX, overrides: RING_GARNET });
     // One shell, four colours of glass — the same override trick the blob tiers
     // use, so the four bubbles cost one grid between them.

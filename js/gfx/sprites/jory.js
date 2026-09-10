@@ -678,6 +678,123 @@ export function shieldRing(size = 26) {
 }
 
 // A stray space is a transparent hole that PixelArt's row-length check cannot
+// ---- the letter ------------------------------------------------------------
+//
+// Drawn on a 24x24 grid rather than the 16x16 the rest of the props use. The
+// extra pixels are not for size — the inventory scales it down to sit level
+// with the books — they are for shading. At 16 there is no room for a paper
+// that turns from lit to shadowed, or a heart with a highlight and a rim, and
+// without those the envelope reads as a flat sticker.
+//
+// The paper is deliberately ONE surface easing from light to dark rather than a
+// lit flap over a darker pocket. Two tones met along the creases, and at icon
+// size that join reads as a scratch down each side rather than as a fold.
+// The letter, sealed. Same 24x24 grid as the other props but drawn with a
+// shading ramp rather than flat fills: the paper is one surface lit from the
+// top left, and the heart carries four tones so it sits on the fold instead of
+// being printed on it. The creases run corner to corner and meet underneath it.
+export const LETTER_CLOSED = [
+  '........................',
+  '........................',
+  '........................',
+  '........................',
+  '.oooooooooooooooooooooo.',
+  '.ooffffffffffffffppppoo.',
+  '.ofofffffffffffpppppopo.',
+  '.offofffffffffpppppoppo.',
+  '.offfofffffffpppppopppo.',
+  '.offffoffhhpprrppoppppo.',
+  '.offfffohhhhrrrropppppo.',
+  '.offffffhhrrrrrRppppppo.',
+  '.offfffphrrrrRRRpppppso.',
+  '.offffppprrrRRRppppssso.',
+  '.offfppppprRRRppppsssso.',
+  '.ofppppppppRRpppsssssso.',
+  '.opppppppppppppssssssso.',
+  '.oppppppppppppsssssssso.',
+  '.oppppppppppsssssssssso.',
+  '.opppppppppssssssssssso.',
+  '.oooooooooooooooooooooo.',
+  '........................',
+  '........................',
+  '........................',
+];
+
+// The same letter with the flap thrown back, and nothing in it. The card is a
+// separate sprite so it can be slid out from behind this one; baked together
+// they could only ever be one still picture.
+export const LETTER_OPEN = [
+  '........................',
+  '........................',
+  '........................',
+  '...........oo...........',
+  '..........oppo..........',
+  '.........oppppo.........',
+  '........oppppppo........',
+  '.......oppppppppo.......',
+  '......oppppppppppo......',
+  '.oooooooooooooooooooooo.',
+  '.offfffffffffffffpppppo.',
+  '.offfffffffffffpppppppo.',
+  '.offfffffffffpppppppppo.',
+  '.offfffffffpppppppppppo.',
+  '.offfffffpppppppppppppo.',
+  '.offfffppppppppppppppso.',
+  '.offfppppppppppppppssso.',
+  '.ofppppppppppppppssssso.',
+  '.opppppppppppppssssssso.',
+  '.opppppppppppssssssssso.',
+  '.opppppppppssssssssssso.',
+  '.oooooooooooooooooooooo.',
+  '........................',
+  '........................',
+];
+
+// What is inside. Taller than the envelope so it reads as a folded sheet, and
+// pink so it is obvious the moment an edge of it clears the paper.
+export const LETTER_CARD = [
+  '........................',
+  '...oooooooooooooooooo...',
+  '...okkkkkkkkkkkkKKKKo...',
+  '...okkkkkkkkkkkkKKKKo...',
+  '...okkkkkkkkkkkKKKKKo...',
+  '...okkkkkhhkkrrKKKKKo...',
+  '...okkkkhhhhrrrrKKKKo...',
+  '...okkkkhhrrrrrRKKKKo...',
+  '...okkkkhrrrrRRRKKKKo...',
+  '...okkkkkrrrRRRKKKKKo...',
+  '...okkkkkKrRRRKKKKKKo...',
+  '...okkkkkKKRRKKKKKKQo...',
+  '...okkkkKKKKKKKKKKQQo...',
+  '...okkkKKKKKKKKKKQQQo...',
+  '...okkKKKKKKKKKKQQQQo...',
+  '...okKKKKKKKKKKKQQQQo...',
+  '...oKKKKKKKKKKKQQQQQo...',
+  '...oKKKKKKKKKKQQQQQQo...',
+  '...oKKKKKKKKKQQQQQQQo...',
+  '...oKKKKKKKKQQQQQQQQo...',
+  '...oooooooooooooooooo...',
+  '........................',
+  '........................',
+  '........................',
+];
+
+// The tones the three grids above are drawn in, as overrides on the shared
+// palette. 'o' is the outline, 'r' and 'R' are already the heart and its shade,
+// so only the paper, the card and the two extra heart tones need naming here.
+// Same trick as RING_GARNET: the letters are spoken for elsewhere in the
+// palette, and remapping them per-texture is cheaper than inventing new ones.
+export const LETTER_INK = {
+  f: '#ffffff', // paper, lit
+  p: '#efedf5', // paper, turning away
+  s: '#d8d5e2', // paper, in shadow
+  h: '#ff8fa8', // heart, catching the light
+  d: '#8f1a33', // heart, the rim furthest from it
+  k: '#ffd9e4', // card, lit
+  K: '#f7b6cb', // card, turning away
+  Q: '#e08fae', // card, in shadow
+};
+
 // catch, so fail loudly at boot instead. This lives at the very bottom because
 // the flat bundle shares one scope and reaching a `const` early is a TDZ error.
 [
@@ -699,6 +816,9 @@ export function shieldRing(size = 26) {
   ...SANDWICH,
   ...CUP,
   ...ROSE_JAR,
+  ...LETTER_CLOSED,
+  ...LETTER_OPEN,
+  ...LETTER_CARD,
 ].forEach((row) => {
   if (row.includes(' ')) throw new Error(`[jory] sprite row contains a space: "${row}"`);
 });

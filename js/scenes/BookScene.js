@@ -153,6 +153,33 @@ const SCHOOL_PAGES = [
   "I love you",
 ];
 
+// The first of the small letters he writes her on a school morning, sent at
+// 5:45 her time so it is the first thing she wakes up to.
+//
+// His words exactly, down to the spelling. The only characters touched are the
+// curly apostrophes his keyboard types, which the font has no glyph for - they
+// are the straight ones here and render identically - and the emoji, which use
+// the stand-ins from EMOJI above.
+//
+// Seven pages for eight paragraphs: the two about the uniform are short and
+// belong to the same thought, so they share a sheet. Everything else breaks
+// where he broke it.
+const LETTER_1 = [
+  "Hi my baby, like I said, I want to start writing small letters for you everyday you go to school. So I'll send these letters to you everyday at 5:45am your time so that they're the first thing you wake up to @@",
+
+  "I love you so much, I'm sooo proud of you for being able to do so much work in school and still be with me despite a long day. I'm really grateful for it too sweetheart. You work so hard and I'm so impressed by it. I love seeing you do better everyday, and try everyday, for anything.",
+
+  "I still get SO happy when I think of my pretty little Jory in her uniform, SO CUTE ^^^ I would give you so many kisses in that uniform till you'd have to iron it all over again",
+
+  "I love you so much baby, everyday I can't even wait for you to come back, I read the letters you send, hear your voice again and again, look at everything about you and read our messages all over again because I miss you and need you so much.",
+
+  "My heart is so full of you and it's always so full of love for you. Thinking about you, let alone seeing you and talking to you makes me so happy, it makes my day.",
+
+  "I love you so much Jory, when you go to school today, do really well, and study well. Have fun with your friends and make sure you drink enough water okay?",
+
+  "I love you my jellyfish, I'll be waiting for you to come back again today, take care my pretty Jory @@^^++",
+];
+
 // The books on the shelf, keyed by what the inventory passes in. Everything
 // that differs between them lives here; the boards, the binding and the paper
 // are the same book twice, because they were given by the same person and one
@@ -177,6 +204,7 @@ const EMOJI = {
   '$': '🤤',
   '&': '😉',
   '*': '🥳',
+  '+': '🪼',
 };
 // Whatever the device has. Every platform ships exactly one of these, so the
 // first that resolves is the native set; the last is there only so a machine
@@ -186,7 +214,7 @@ const EMOJI_FONT =
 // The blank that widens a stand-in to two slots, and the stand-ins themselves.
 // See widenEmoji for why the filler is not a space.
 const EMOJI_PAD = '_';
-const EMOJI_KEYS = /[\^@#%$&*]/g;
+const EMOJI_KEYS = /[\^@#%$&*+]/g;
 // Sized to the pair of slots it now owns. Two advances is 26px, and an emoji is
 // about 1.37 times as wide as its font size, so 18px lands at 25px and sits
 // inside its own space. The artwork inside an emoji does not fill its box, so
@@ -206,6 +234,16 @@ const BOOKS = {
     pages: SCHOOL_PAGES,
     cover: 0x8e5bc4,
     coverDark: 0x5f3690,
+  },
+  // Not a book, and the page knows it: `bound: false` drops the spine and the
+  // gutter, because a sheet out of an envelope has no binding to sit in, and a
+  // letter with a spine down its left edge is a book pretending otherwise.
+  letter1: {
+    title: 'Letter 1',
+    pages: LETTER_1,
+    cover: 0xf7b6cb,
+    coverDark: 0xe08fae,
+    bound: false,
   },
 };
 const DEFAULT_BOOK = 'beautiful';
@@ -255,11 +293,15 @@ const BOOK_CHARS_PER_LINE = Math.floor(
 const BOOK_INK = 0x241f2e;
 const BOOK_PAPER = 0xf6f2e8;
 
-// One reward panel. Three of them and their gaps have to live inside 480, which
-// is what sets the width — the height is unchanged, so the row sits exactly
-// where the pair used to.
-const REWARD_W = 140;
-const REWARD_H = 196;
+// One reward panel. Four things no longer fit across 480, so they go two by
+// two: the panels get wider again than the three-across version managed, and
+// shorter, to buy the room the second row needs.
+const REWARD_W = 170;
+const REWARD_H = 170;
+// Every icon is drawn to this width whatever grid it came from. The books and
+// the ring are 16 wide, the letter is 24, and left alone at a shared scale the
+// letter would tower over them by half again.
+const REWARD_ICON_W = 128;
 
 // What she gets for opening it: the rewards laid out side by side, and then the
 // book itself if she wants to read it. Both views live in this one scene —
@@ -299,6 +341,78 @@ export class BookScene extends Phaser.Scene {
   // short enough is left alone; anything longer than a page is carried onto as
   // many as it needs. The point is that whoever is writing can just write, and
   // never has to think about where a page ends or count characters.
+  // Opening the letter, in three beats: the flap goes back, the card rises out
+  // of it, and the card becomes the page she reads.
+  //
+  // The card is its own sprite sitting BEHIND the envelope, which is the whole
+  // reason there are three textures rather than one picture of an opened one.
+  // Behind the paper it is simply not visible; tweened upward it clears the top
+  // edge the way a card actually comes out of an envelope. Baked into a single
+  // image it could only ever be a still.
+  //
+  // Every step checks the sprite is still on a scene: these are timed callbacks,
+  // and if she leaves mid-open they would otherwise land on destroyed objects.
+  openLetter() {
+    this.bookId = 'letter1';
+    this.pages = this.buildPages();
+    this.page = 0;
+    this.clearView();
+
+    const cx = GAME_W / 2;
+    const cy = 300;
+
+    const env = this.add.image(cx, cy, 'letter_closed').setDepth(402);
+    const scale = 280 / env.width;
+    env.setScale(scale);
+    this.track(env);
+
+    // Level with the envelope and one layer under it, so none of it shows yet.
+    const card = this.add.image(cx, cy, 'letter_card').setDepth(401).setScale(scale);
+    this.track(card);
+
+    const label = new PixelText(this, cx, cy + 210, 'OPENING IT', {
+      scale: 1,
+      color: 0xffe08a,
+    });
+    this.track(label.setDepth(600));
+
+    // 1 - the flap goes back. The page turn is the right sound for it: same
+    // paper, and it is already loaded.
+    this.time.delayedCall(300, () => {
+      if (!env.scene) return;
+      audio.play('page');
+      env.setTexture('letter_open');
+    });
+
+    // 2 - the card rises out, overshooting a little as it clears the paper.
+    this.time.delayedCall(460, () => {
+      if (!card.scene) return;
+      this.tweens.add({
+        targets: card,
+        y: cy - env.displayHeight * 0.5,
+        duration: 640,
+        ease: 'Back.out',
+      });
+    });
+
+    // 3 - it comes at the reader and turns into the page.
+    this.time.delayedCall(1260, () => {
+      if (!card.scene) return;
+      audio.play('page');
+      this.tweens.add({
+        targets: card,
+        scale: scale * 2.6,
+        alpha: 0,
+        duration: 420,
+        ease: 'Quad.in',
+      });
+      this.tweens.add({ targets: [env, label.container], alpha: 0, duration: 320 });
+      this.time.delayedCall(420, () => {
+        if (this.scene.isActive()) this.showPage(0);
+      });
+    });
+  }
+
   // The book currently open, and the sheets it has been laid out onto. Built on
   // the way in to a cover rather than up front, so the book she never opens is
   // never wrapped.
@@ -398,19 +512,23 @@ export class BookScene extends Phaser.Scene {
     // shorter route, and the ring stays inert so only the readable things light
     // up.
     //
-    // Three across rather than two, so both books and the ring are all one tap
-    // away. 480 wide will not carry three of the old 176-wide panels, so they
-    // come in to 140 with a 10px gap.
+    // Two by two. Four across will not fit 480 at any size worth tapping, and a
+    // single row of four tiny panels reads as a toolbar rather than as the
+    // things she was given.
     //
-    // Numbered rather than named. Two books want telling apart at a glance more
-    // than they want describing, and the covers do the describing anyway — pink
-    // for the first, purple for the second, which is the same difference the
-    // icons carry here.
-    this.reward(cx - 150, 292, 'book', 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
-    this.reward(cx, 292, 'book2', 'BOOK 2', 160, this.later(() => this.openBook('schoolgirl')));
-    this.reward(cx + 150, 292, 'ring', 'A RING', 320);
+    // Reading order: the two books first, then the newest thing, then the ring.
+    // The ring sits last because it is the one that does nothing when pressed.
+    //
+    // Numbered rather than named. Things want telling apart at a glance more
+    // than they want describing, and the art does the describing anyway.
+    const c1 = cx - 90;
+    const c2 = cx + 90;
+    this.reward(c1, 235, 'book', 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
+    this.reward(c2, 235, 'book2', 'BOOK 2', 120, this.later(() => this.openBook('schoolgirl')));
+    this.reward(c1, 405, 'letter_closed', 'LETTER 1', 240, this.later(() => this.openLetter()));
+    this.reward(c2, 405, 'ring', 'A RING', 360);
 
-    const hint = new PixelText(this, cx, 418, '(TAP A BOOK TO READ IT)', {
+    const hint = new PixelText(this, cx, 520, '(TAP ONE TO READ IT)', {
       scale: 1,
       color: 0x9a94b0,
     });
@@ -431,7 +549,7 @@ export class BookScene extends Phaser.Scene {
     if (this.fromMenu) {
       // Nothing to play again from here — she came to look at them, not to win
       // them, so there is one way out and it goes back where she came from.
-      const back = new MenuButton(this, cx, 600, 'BACK', {
+      const back = new MenuButton(this, cx, 620, 'BACK', {
         scale: 3,
         minWidth: 300,
         onPick: () => this.scene.start('Menu'),
@@ -441,12 +559,12 @@ export class BookScene extends Phaser.Scene {
       return;
     }
 
-    const again = new MenuButton(this, cx, 555, 'PLAY AGAIN', {
+    const again = new MenuButton(this, cx, 620, 'PLAY AGAIN', {
       scale: 3,
       minWidth: 300,
       onPick: () => this.scene.start('JoryIntro'),
     });
-    const menu = new MenuButton(this, cx, 650, 'MAIN MENU', {
+    const menu = new MenuButton(this, cx, 706, 'MAIN MENU', {
       scale: 2,
       minWidth: 300,
       onPick: () => this.scene.start('Menu'),
@@ -507,12 +625,15 @@ export class BookScene extends Phaser.Scene {
       ease: 'Sine.inOut',
     });
 
-    const item = this.add.image(cx, cy - 10, texture).setDepth(402).setScale(0);
+    const item = this.add.image(cx, cy - 8, texture).setDepth(402).setScale(0);
     this.track(item);
-    this.tweens.add({ targets: item, scale: 4, duration: 620, delay, ease: 'Back.out' });
+    // Read off the texture rather than hard-coded, so a sprite drawn on a bigger
+    // grid lands the same width on the shelf as one drawn on a smaller one.
+    const iconScale = REWARD_ICON_W / item.width;
+    this.tweens.add({ targets: item, scale: iconScale, duration: 620, delay, ease: 'Back.out' });
     this.tweens.add({
       targets: item,
-      y: cy - 22,
+      y: cy - 20,
       duration: 1600,
       yoyo: true,
       repeat: -1,
@@ -593,7 +714,9 @@ export class BookScene extends Phaser.Scene {
   // page one closes the book back to its cover rather than doing nothing.
   turnTo(n) {
     audio.play('page');
-    if (n < 0) this.showCover();
+    // A letter has no front board to close back to, so page one turns left onto
+    // the shelf instead of onto a cover that does not exist.
+    if (n < 0) (this.book.bound === false ? this.showRewards() : this.showCover());
     else this.showPage(n);
   }
 
@@ -737,14 +860,19 @@ export class BookScene extends Phaser.Scene {
       frameWidth: BOOK_FRAME,
     });
     this.track(paper);
-    this.drawBinding(cx, cy);
+    const bound = this.book.bound !== false;
+    if (bound) this.drawBinding(cx, cy);
 
     // The spine eats into the left of the page, so the column sits right of
     // centre. Centring the text on the panel instead would push it into the
     // binding and leave a margin twice as wide down the outer edge.
     const faceL = cx - BOOK_PAGE_W / 2 + BOOK_EDGE + BOOK_FRAME;
     const faceR = cx + BOOK_PAGE_W / 2 - BOOK_EDGE - BOOK_FRAME;
-    const textCx = (faceL + BOOK_SPINE_W + BOOK_GUTTER_W + faceR) / 2;
+    // Bound pages sit right of the spine so the column is not swallowed by the
+    // gutter. A loose sheet has neither, so it centres on the paper.
+    const textCx = bound
+      ? (faceL + BOOK_SPINE_W + BOOK_GUTTER_W + faceR) / 2
+      : (faceL + faceR) / 2;
 
     const top = cy - ((lines.length - 1) * step) / 2;
     lines.forEach((line, i) => {
