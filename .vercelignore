@@ -1,0 +1,30 @@
+# What the website does not need. Everything here stays in the repo - this only
+# keeps it from being uploaded to the host and served to anyone who guesses a
+# URL, which is what GitHub Pages has been doing with all of it.
+#
+# The site is index.html, manifest.json, js/ and audio/. Nothing else.
+
+# The phone build: an 11 MB apk, its manifest, its sources and its vendored
+# copy of phaser. Built from this repo, never fetched by the browser.
+android/
+
+# The small AAC set, for a host with a size cap. This build reads the mp3
+# masters - AUDIO_EXT in AudioManager.js says so - so shipping these too would
+# be 2.7 MB nobody asks for.
+audio-web/
+
+# Build scripts and their outputs.
+*.ps1
+*.zip
+
+# The single-file bundle. Still built, still what the apk is made from, but the
+# site runs from js/ and never loads it.
+heartbound.html
+
+# Notes to whoever works on this, not a page.
+README.md
+
+# Repo bookkeeping. Harmless, but there is no reason for a visitor to be able
+# to fetch them - .gitignore in particular names the signing keystore.
+.gitignore
+.gitattributes
