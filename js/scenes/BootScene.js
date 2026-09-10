@@ -28,6 +28,7 @@ import {
   LETTER_OPEN,
   LETTER_CARD,
   LETTER_INK,
+  PETAL_WHITE,
   RING,
   RING_GARNET,
   BUBBLE_HEAL,
@@ -171,7 +172,7 @@ export class BootScene extends Phaser.Scene {
     makeTexture(this, 'blanket', makeBlanket(40, 30, 4), { pixelSize: 3 });
     makeTexture(this, 'basket', BASKET, { pixelSize: PX });
     makeTexture(this, 'shock', SHOCK, { pixelSize: PX });
-    makeTexture(this, 'flower', FLOWER, { pixelSize: PX });
+    makeTexture(this, 'flower', FLOWER, { pixelSize: PX, overrides: PETAL_WHITE });
     makeTexture(this, 'bush', BUSH, { pixelSize: PX });
     makeSheet(this, FONT_KEY, FONT_FRAMES, { pixelSize: FONT_PX });
     makeSheet(this, FONT_KEY_SEMI, FONT_FRAMES_SEMI, { pixelSize: FONT_PX_SEMI });
@@ -204,7 +205,7 @@ export class BootScene extends Phaser.Scene {
 
     // The meadow in the Jory opening.
     makeTexture(this, 'rose_red', ROSE_RED, { pixelSize: PX });
-    makeTexture(this, 'rose_white', ROSE_WHITE, { pixelSize: PX });
+    makeTexture(this, 'rose_white', ROSE_WHITE, { pixelSize: PX, overrides: PETAL_WHITE });
     makeTexture(this, 'smiley', SMILEY, { pixelSize: PX });
     makeTexture(this, 'pond', pondGrid(58, 32), { pixelSize: 3 });
     makeTexture(this, 'reeds', REEDS, { pixelSize: PX });

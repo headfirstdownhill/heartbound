@@ -170,12 +170,12 @@ const BASE_PRESETS = {
   // The front end can afford to be lush; there is nothing to read quickly.
   menu: { bloom: 2.4, vignette: 0.62, aberration: 0.0035, scanline: 0.05 },
   // Daylight. Barely any vignette, because the room is supposed to feel open.
-  garden: { bloom: 1.5, vignette: 0.55, aberration: 0.0022, scanline: 0.045 },
+  garden: { bloom: 0.75, vignette: 0.55, aberration: 0.0022, scanline: 0.045 },
   // Underground: heavier corners, colder, and the bloom does most of the work
   // of selling the torchlight.
   dungeon: { bloom: 2.2, vignette: 0.8, aberration: 0.003, scanline: 0.06 },
   boss: { bloom: 2.6, vignette: 0.88, aberration: 0.0042, scanline: 0.06 },
-  meadow: { bloom: 1.9, vignette: 0.62, aberration: 0.0025, scanline: 0.04 },
+  meadow: { bloom: 1.0, vignette: 0.62, aberration: 0.0025, scanline: 0.04 },
   // The letter should read cleanly, so almost everything is dialled back.
   book: { bloom: 1.6, vignette: 0.55, aberration: 0.0012, scanline: 0.03 },
   win: { bloom: 2.6, vignette: 0.5, aberration: 0.003, scanline: 0.04 },

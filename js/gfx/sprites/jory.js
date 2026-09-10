@@ -419,8 +419,18 @@ const CAT_SIT_B = [
 
 export const CAT_WALK = CRITTER_STYLE === 'plush' ? [CAT_SIT_A, CAT_SIT_B] : [CAT_A, CAT_B];
 
+// Petals and fur, kept just off pure white.
+//
+// The bloom pass adds light to anything brighter than its threshold, and it
+// cannot tell a lit thing from a white thing — both arrive at the shader as
+// 1.0. Pure white art therefore glows exactly as hard as a torch does, which
+// is how a lawn of daisies and one white cat ended up luminous. Reserving
+// #ffffff for actual light and giving the art a paper white instead costs
+// nothing at a glance against grass and takes them out of the glow.
+export const PETAL_WHITE = { w: '#f0eef7' };
+
 export const CAT_COATS = {
-  cat_white: { g: '#ffffff', G: '#d5d5e0' },
+  cat_white: { g: '#f0eef7', G: '#d5d5e0' },
   cat_toast: { g: '#c98a4b', G: '#96622f' },
   cat_black: { g: '#3a3540', G: '#241f2e' },
 };
