@@ -11,29 +11,29 @@ turn used in the letter.
 
 ## Playing it / putting it online
 
-**Live at <https://heartboundgame.vercel.app/>.**
+**Live at <https://headfirstdownhill.github.io/heartbound/>.**
 
-That is the `index.html` + `js/` version, served by Vercel straight out of this
-repo — there is no build step in front of it. Change something under `js/`,
+That is the `index.html` + `js/` version, served by GitHub Pages straight out of
+this repo — there is no build step in front of it. Change something under `js/`,
 commit, push, and the site is updated a minute later. The `audio/` masters sit
 beside it in the repo, so `AUDIO_BASE` needs no rewriting.
 
-**This repo is private, and the site is public.** That combination is why it is
-on Vercel and not GitHub Pages: Pages will only serve a public repo on a free
-account, so keeping the letters out of a public repo meant the link had to die.
-Vercel's free tier deploys a private repo to a public URL, which is the whole
-reason for the move. `heartbound-nine.vercel.app` is the name Vercel assigned
-before the domain was set, kept as a 307 redirect.
+It lives at the `/heartbound/` subpath rather than at a domain root, which costs
+nothing: every path in the game is relative, so it runs unchanged either way.
 
-Private is about the repo, not the reader. The game is client-side, so the
-browser downloads `js/scenes/BookScene.js` to run it and anyone on the site can
-read the letters out of it. What private buys is that they are not browsable on
-github.com, not indexed, and not scraped.
+**The repo is public, and on a free account it has to be.** Pages will only
+serve a public repo, so the letters in `js/scenes/BookScene.js` are readable on
+github.com. That was the reason for a spell on Vercel, whose free tier will
+serve a private repo at a public URL — but private was only ever about the repo,
+not the reader: the game is client-side, so anyone who opens the site downloads
+that file anyway. The move back traded a benefit that was smaller than it looked
+for one less thing to keep running.
 
-`.vercelignore` decides what the host actually gets: `index.html`,
-`manifest.json`, `js/` and `audio/`, and nothing else. The apk, the build
-scripts, the notes and the spare AAC set stay in the repo but never reach the
-web — Pages used to serve all of them.
+Two things Pages does not do that Vercel did. It serves the whole repo root, so
+`android/heartbound.apk` and the build scripts are fetchable from the site as
+well — `.vercelignore` is kept for that reason and does nothing here, and moving
+the site into `docs/` is the fix if it ever matters. And there is no redirect
+from the old `heartboundgame.vercel.app`; that link is simply gone.
 
 The zip and the apk below are still how tiiny.host and Android get fed.
 
@@ -77,8 +77,9 @@ arrives a moment later.
 
 The `index.html` + `js/` version is the same game as editable source. It uses ES
 modules, so it needs a real web server — opening `index.html` by double-clicking
-will not work. Vercel is a real web server, which is why the live link above
-serves that version directly; any other host wants the whole folder zipped.
+will not work. GitHub Pages is a real web server, which is why the live link
+above serves that version directly; any other host wants the whole folder
+zipped.
 
 ## Putting it on a phone
 
