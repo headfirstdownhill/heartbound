@@ -228,12 +228,14 @@ const BOOKS = {
     pages: PAGES,
     cover: 0xe8557f,
     coverDark: 0xb83a5e,
+    icon: 'book',
   },
   schoolgirl: {
     title: 'For My Schoolgirl Jory',
     pages: SCHOOL_PAGES,
     cover: 0x8e5bc4,
     coverDark: 0x5f3690,
+    icon: 'book2',
   },
   // Not a book, and the page knows it: `bound: false` drops the spine and the
   // gutter, because a sheet out of an envelope has no binding to sit in, and a
@@ -244,6 +246,7 @@ const BOOKS = {
     cover: 0xf7b6cb,
     coverDark: 0xe08fae,
     bound: false,
+    icon: 'letter_closed',
   },
 };
 const DEFAULT_BOOK = 'beautiful';
@@ -361,7 +364,7 @@ export class BookScene extends Phaser.Scene {
     const cx = GAME_W / 2;
     const cy = 300;
 
-    const env = this.add.image(cx, cy, 'letter_closed').setDepth(402);
+    const env = this.add.image(cx, cy, this.book.icon).setDepth(402);
     const scale = 280 / env.width;
     env.setScale(scale);
     this.track(env);
@@ -419,7 +422,49 @@ export class BookScene extends Phaser.Scene {
   openBook(id) {
     this.bookId = BOOKS[id] ? id : DEFAULT_BOOK;
     this.pages = this.buildPages();
-    this.showCover();
+    this.page = 0;
+    this.clearView();
+
+    const cx = GAME_W / 2;
+    const cy = 300;
+    const icon = this.add.image(cx, cy, this.book.icon).setDepth(402);
+    icon.setScale(200 / icon.width);
+    this.track(icon);
+    const base = icon.scaleX;
+
+    const label = new PixelText(this, cx, cy + 190, 'OPENING IT', {
+      scale: 1,
+      color: 0xffe08a,
+    });
+    this.track(label.setDepth(600));
+
+    // 1 - picked up off the shelf.
+    this.tweens.add({
+      targets: icon,
+      y: cy - 14,
+      scaleX: base * 1.08,
+      scaleY: base * 1.08,
+      duration: 260,
+      ease: 'Back.out',
+    });
+
+    // 2 - the front board swings. At this size that is the cover narrowing to
+    // its own spine rather than any drawn hinge: there are not enough pixels
+    // for a board at an angle, and the narrowing reads as the same motion.
+    this.time.delayedCall(320, () => {
+      if (!icon.scene) return;
+      audio.play('page');
+      this.tweens.add({ targets: icon, scaleX: base * 0.06, duration: 300, ease: 'Quad.in' });
+    });
+
+    // 3 - and it is open, at the size she reads it.
+    this.time.delayedCall(640, () => {
+      if (!icon.scene) return;
+      this.tweens.add({ targets: [icon, label.container], alpha: 0, duration: 200 });
+      this.time.delayedCall(200, () => {
+        if (this.scene.isActive()) this.showCover();
+      });
+    });
   }
 
   get book() {
@@ -523,9 +568,9 @@ export class BookScene extends Phaser.Scene {
     // than they want describing, and the art does the describing anyway.
     const c1 = cx - 90;
     const c2 = cx + 90;
-    this.reward(c1, 235, 'book', 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
-    this.reward(c2, 235, 'book2', 'BOOK 2', 120, this.later(() => this.openBook('schoolgirl')));
-    this.reward(c1, 405, 'letter_closed', 'LETTER 1', 240, this.later(() => this.openLetter()));
+    this.reward(c1, 235, BOOKS.beautiful.icon, 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
+    this.reward(c2, 235, BOOKS.schoolgirl.icon, 'BOOK 2', 120, this.later(() => this.openBook('schoolgirl')));
+    this.reward(c1, 405, BOOKS.letter1.icon, 'LETTER 1', 240, this.later(() => this.openLetter()));
     this.reward(c2, 405, 'ring', 'A RING', 360);
 
     const hint = new PixelText(this, cx, 520, '(TAP ONE TO READ IT)', {
