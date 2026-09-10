@@ -113,6 +113,12 @@ $html = @"
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0d0b14">
 <title>Heartbound</title>
+<!-- Tab icon. There is not a single image file in this project - every sprite is
+     a pixel grid drawn in code - and this keeps it that way: the heart out of
+     items.js, the same one she spends the game chasing, rendered to an inline
+     SVG. It also survives the single-file build, which has nowhere to keep a
+     favicon.ico next to it. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13' shape-rendering='crispEdges'%3E%3Crect width='13' height='13' fill='%230d0b14'/%3E%3Crect x='3' y='1' width='2' height='1' fill='%23ff4d6d'/%3E%3Crect x='8' y='1' width='2' height='1' fill='%23ff4d6d'/%3E%3Crect x='2' y='2' width='1' height='1' fill='%23ff4d6d'/%3E%3Crect x='3' y='2' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='4' y='2' width='2' height='1' fill='%23ff4d6d'/%3E%3Crect x='7' y='2' width='4' height='1' fill='%23ff4d6d'/%3E%3Crect x='1' y='3' width='1' height='1' fill='%23ff4d6d'/%3E%3Crect x='2' y='3' width='1' height='1' fill='%23ffffff'/%3E%3Crect x='3' y='3' width='9' height='1' fill='%23ff4d6d'/%3E%3Crect x='1' y='4' width='11' height='1' fill='%23ff4d6d'/%3E%3Crect x='1' y='5' width='11' height='1' fill='%23ff4d6d'/%3E%3Crect x='2' y='6' width='9' height='1' fill='%23c22a4c'/%3E%3Crect x='3' y='7' width='7' height='1' fill='%23c22a4c'/%3E%3Crect x='4' y='8' width='5' height='1' fill='%23c22a4c'/%3E%3Crect x='5' y='9' width='3' height='1' fill='%23c22a4c'/%3E%3Crect x='6' y='10' width='1' height='1' fill='%23c22a4c'/%3E%3C/svg%3E">
 <style>
   html, body {
     margin: 0; padding: 0; background: #0d0b14; overflow: hidden;
