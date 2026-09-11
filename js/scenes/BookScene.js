@@ -180,6 +180,27 @@ const LETTER_1 = [
   "I love you my jellyfish, I'll be waiting for you to come back again today, take care my pretty Jory @@^^++",
 ];
 
+// The second of the school-morning letters, sent the same way as the first.
+//
+// His words, unaltered. The curly apostrophes his keyboard types have no glyph
+// in the font so they are the straight ones here, and the emoji are the
+// stand-ins from EMOJI - nothing else is touched.
+const LETTER_2 = [
+  "Hello! my pretty baby, good morning again @@ I love you so much, and I hope you slept well baby",
+
+  "Finally today is FRIDAY, finally you can have some time for yourself.. AND I can have my pretty and beautiful bunny all to myself after you finish school **",
+
+  "I love you baby, I hope your day today goes super well, have fun with your friends and study very hard # and maybe this time... don't wink at the teachers... OR ANYONE %%",
+
+  "Make your hair look super cool and pretty, and make yourself pretty baby. I love you so much and I WISH I COULD GIVE YOU 300 KISSES ALL OVER YOU before you go to school ^^^",
+
+  "And depending on how well I slept last night, I'll decide how mischievous you can be today.. I love you my bunny",
+
+  "I won't say much so you don't waste your waking hours reading instead of getting ready..",
+
+  "I LOVE YOU MY PRETTY BABY I LOVE YOU JORY ^^^++",
+];
+
 // The books on the shelf, keyed by what the inventory passes in. Everything
 // that differs between them lives here; the boards, the binding and the paper
 // are the same book twice, because they were given by the same person and one
@@ -248,7 +269,29 @@ const BOOKS = {
     bound: false,
     icon: 'letter_closed',
   },
+  letter2: {
+    title: 'Letter 2',
+    pages: LETTER_2,
+    cover: 0xf7b6cb,
+    coverDark: 0xe08fae,
+    bound: false,
+    icon: 'letter_closed',
+  },
 };
+
+// What sits on the shelf, in reading order, and the only place it is listed.
+// Adding another letter is a line here plus its entry in BOOKS - the grid below
+// works out where everything goes, which is the point: this row has been
+// hand-placed three times now and re-broken every time something was added.
+const SHELF = [
+  { book: 'beautiful', label: 'BOOK 1' },
+  { book: 'schoolgirl', label: 'BOOK 2' },
+  { book: 'letter1', label: 'LETTER 1' },
+  { book: 'letter2', label: 'LETTER 2' },
+  // The one thing that is hers to have rather than to read, so it has no book
+  // behind it and nothing happens when it is pressed.
+  { icon: 'ring', label: 'A RING' },
+];
 const DEFAULT_BOOK = 'beautiful';
 
 // A fixed portrait page. The first pass sized the paper to its text, which for
@@ -299,12 +342,19 @@ const BOOK_PAPER = 0xf6f2e8;
 // One reward panel. Four things no longer fit across 480, so they go two by
 // two: the panels get wider again than the three-across version managed, and
 // shorter, to buy the room the second row needs.
-const REWARD_W = 170;
-const REWARD_H = 170;
+const REWARD_W = 140;
+const REWARD_H = 150;
+// Three to a row is what 480 carries at a size still worth a thumb. The last
+// row centres whatever is left over, so five things read as five rather than as
+// six with a hole in them.
+const SHELF_COLS = 3;
+const SHELF_GAP = 10;
+const SHELF_TOP = 232;
+const SHELF_ROW_H = REWARD_H + 14;
 // Every icon is drawn to this width whatever grid it came from. The books and
 // the ring are 16 wide, the letter is 24, and left alone at a shared scale the
 // letter would tower over them by half again.
-const REWARD_ICON_W = 128;
+const REWARD_ICON_W = 104;
 
 // What she gets for opening it: the rewards laid out side by side, and then the
 // book itself if she wants to read it. Both views live in this one scene —
@@ -355,8 +405,8 @@ export class BookScene extends Phaser.Scene {
   //
   // Every step checks the sprite is still on a scene: these are timed callbacks,
   // and if she leaves mid-open they would otherwise land on destroyed objects.
-  openLetter() {
-    this.bookId = 'letter1';
+  openLetter(id) {
+    this.bookId = BOOKS[id] ? id : 'letter1';
     this.pages = this.buildPages();
     this.page = 0;
     this.clearView();
@@ -557,23 +607,31 @@ export class BookScene extends Phaser.Scene {
     // shorter route, and the ring stays inert so only the readable things light
     // up.
     //
-    // Two by two. Four across will not fit 480 at any size worth tapping, and a
-    // single row of four tiny panels reads as a toolbar rather than as the
-    // things she was given.
-    //
-    // Reading order: the two books first, then the newest thing, then the ring.
-    // The ring sits last because it is the one that does nothing when pressed.
-    //
-    // Numbered rather than named. Things want telling apart at a glance more
-    // than they want describing, and the art does the describing anyway.
-    const c1 = cx - 90;
-    const c2 = cx + 90;
-    this.reward(c1, 235, BOOKS.beautiful.icon, 'BOOK 1', 0, this.later(() => this.openBook('beautiful')));
-    this.reward(c2, 235, BOOKS.schoolgirl.icon, 'BOOK 2', 120, this.later(() => this.openBook('schoolgirl')));
-    this.reward(c1, 405, BOOKS.letter1.icon, 'LETTER 1', 240, this.later(() => this.openLetter()));
-    this.reward(c2, 405, 'ring', 'A RING', 360);
+    // Laid out from SHELF rather than by hand. Three to a row, the last row
+    // centred, and the rows pushed down from SHELF_TOP - so a new letter is a
+    // line in that list and nothing here has to move.
+    const rows = Math.ceil(SHELF.length / SHELF_COLS);
+    SHELF.forEach((it, i) => {
+      const r = Math.floor(i / SHELF_COLS);
+      const inRow = Math.min(SHELF_COLS, SHELF.length - r * SHELF_COLS);
+      const col = i - r * SHELF_COLS;
+      const x = cx + (col - (inRow - 1) / 2) * (REWARD_W + SHELF_GAP);
+      const y = SHELF_TOP + r * SHELF_ROW_H;
+      const entry = it.book ? BOOKS[it.book] : null;
+      const icon = entry ? entry.icon : it.icon;
+      // The ring has no book behind it, so it is the one panel that never lights.
+      const open = !it.book
+        ? null
+        : entry.bound === false
+          ? this.later(() => this.openLetter(it.book))
+          : this.later(() => this.openBook(it.book));
+      this.reward(x, y, icon, it.label, i * 110, open);
+    });
 
-    const hint = new PixelText(this, cx, 520, '(TAP ONE TO READ IT)', {
+    const shelfBottom = SHELF_TOP + (rows - 1) * SHELF_ROW_H + REWARD_H / 2;
+    const hintY = shelfBottom + 46;
+
+    const hint = new PixelText(this, cx, hintY, '(TAP ONE TO READ IT)', {
       scale: 1,
       color: 0x9a94b0,
     });
@@ -594,7 +652,7 @@ export class BookScene extends Phaser.Scene {
     if (this.fromMenu) {
       // Nothing to play again from here — she came to look at them, not to win
       // them, so there is one way out and it goes back where she came from.
-      const back = new MenuButton(this, cx, 620, 'BACK', {
+      const back = new MenuButton(this, cx, hintY + 84, 'BACK', {
         scale: 3,
         minWidth: 300,
         onPick: () => this.scene.start('Menu'),
@@ -604,12 +662,12 @@ export class BookScene extends Phaser.Scene {
       return;
     }
 
-    const again = new MenuButton(this, cx, 620, 'PLAY AGAIN', {
+    const again = new MenuButton(this, cx, hintY + 84, 'PLAY AGAIN', {
       scale: 3,
       minWidth: 300,
       onPick: () => this.scene.start('JoryIntro'),
     });
-    const menu = new MenuButton(this, cx, 706, 'MAIN MENU', {
+    const menu = new MenuButton(this, cx, hintY + 170, 'MAIN MENU', {
       scale: 2,
       minWidth: 300,
       onPick: () => this.scene.start('Menu'),
@@ -657,7 +715,7 @@ export class BookScene extends Phaser.Scene {
       this.track(zone);
     }
 
-    const halo = this.add.ellipse(cx, cy + 56, 84, 24, 0x8f6bb0, 0.5).setDepth(401);
+    const halo = this.add.ellipse(cx, cy + REWARD_H * 0.3, 74, 22, 0x8f6bb0, 0.5).setDepth(401);
     this.track(halo);
     this.tweens.add({
       targets: halo,
@@ -670,7 +728,7 @@ export class BookScene extends Phaser.Scene {
       ease: 'Sine.inOut',
     });
 
-    const item = this.add.image(cx, cy - 8, texture).setDepth(402).setScale(0);
+    const item = this.add.image(cx, cy - REWARD_H * 0.08, texture).setDepth(402).setScale(0);
     this.track(item);
     // Read off the texture rather than hard-coded, so a sprite drawn on a bigger
     // grid lands the same width on the shelf as one drawn on a smaller one.
@@ -678,7 +736,7 @@ export class BookScene extends Phaser.Scene {
     this.tweens.add({ targets: item, scale: iconScale, duration: 620, delay, ease: 'Back.out' });
     this.tweens.add({
       targets: item,
-      y: cy - 20,
+      y: cy - REWARD_H * 0.16,
       duration: 1600,
       yoyo: true,
       repeat: -1,
@@ -686,7 +744,7 @@ export class BookScene extends Phaser.Scene {
       ease: 'Sine.inOut',
     });
 
-    const name = new PixelText(this, cx, cy + 78, label, { scale: 1, color: 0xffe08a });
+    const name = new PixelText(this, cx, cy + REWARD_H * 0.45, label, { scale: 1, color: 0xffe08a });
     this.track(name.setDepth(403));
     this.fadeIn(name.container, delay + 500);
   }
