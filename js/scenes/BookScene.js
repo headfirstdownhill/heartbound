@@ -263,6 +263,10 @@ const BOOKS = {
   // letter with a spine down its left edge is a book pretending otherwise.
   letter1: {
     title: 'Letter 1',
+    // Written the night before she went back; stamped on the first sheet the
+    // way a dated letter is, so the two of them stay in order once there are
+    // more of them than she can hold in her head.
+    date: 'Thursday 10/09/2026',
     pages: LETTER_1,
     cover: 0xf7b6cb,
     coverDark: 0xe08fae,
@@ -271,6 +275,7 @@ const BOOKS = {
   },
   letter2: {
     title: 'Letter 2',
+    date: 'Friday 11/09/2026',
     pages: LETTER_2,
     cover: 0xf7b6cb,
     coverDark: 0xe08fae,
@@ -337,6 +342,9 @@ const BOOK_CHARS_PER_LINE = Math.floor(
   (BOOK_TEXT_W + BOOK_GLYPH_TRAIL) / (BOOK_GLYPH_ADVANCE * BOOK_SCALE),
 );
 const BOOK_INK = 0x241f2e;
+// The date sits in a lighter hand than the letter. Full ink would read as the
+// first line of the writing rather than as something stamped on the paper.
+const BOOK_DATE_INK = 0x8b8399;
 const BOOK_PAPER = 0xf6f2e8;
 
 // One reward panel. Four things no longer fit across 480, so they go two by
@@ -976,6 +984,21 @@ export class BookScene extends Phaser.Scene {
     const textCx = bound
       ? (faceL + BOOK_SPINE_W + BOOK_GUTTER_W + faceR) / 2
       : (faceL + faceR) / 2;
+
+    // The date, on the first sheet only, ranged right against the same margin
+    // the writing uses. High enough that a full twenty-line page still clears
+    // it: the text block is centred on the paper, so at its tallest it starts
+    // twenty-odd pixels below this.
+    if (this.page === 0 && this.book.date) {
+      const stamp = new PixelText(this, textCx + BOOK_TEXT_W / 2, 70, this.book.date, {
+        scale: 1,
+        color: BOOK_DATE_INK,
+        align: 'right',
+        maxWidth: BOOK_TEXT_W,
+      });
+      this.track(stamp.setDepth(402));
+      this.fadeIn(stamp.container, 120);
+    }
 
     const top = cy - ((lines.length - 1) * step) / 2;
     lines.forEach((line, i) => {
