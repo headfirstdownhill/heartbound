@@ -3,6 +3,10 @@
 # Pin everything to LF so the repo reads the same on any machine.
 * text=auto eol=lf
 
+# Batch files are read by cmd.exe, which needs CRLF - with LF only, a GOTO
+# near the end of the file fails with "cannot find the batch label specified".
+*.bat      text eol=crlf
+
 # Already-compressed or signed; never transform these.
 *.mp3      binary
 *.m4a      binary
