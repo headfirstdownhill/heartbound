@@ -281,7 +281,7 @@ that does need a change inside the game. You have two options.
 **The easy option:** take that emoji out of the letter file, or swap it for one
 the game already knows:
 
-> ❤️ 😁 😎 🤬 🤤 😉 🥳 🪼 😋
+> ❤️ 😁 😎 🤬 🤤 😉 🥳 🪼 😋 💏
 
 **The proper option:** have it added to the game. It's a small change, but it is
 code. Paste this into any AI chat, along with the emoji it named:
@@ -302,7 +302,7 @@ code. Paste this into any AI chat, along with the emoji it named:
 > simple steps, exactly what to type and where. I have never edited code before.
 > Note that I need to add it to BOTH the list AND the `EMOJI_KEYS` line, and the
 > character I pick must be one that has no letter shape in the game's font — the
-> game already uses `^ @ # % $ & * + =` and `_`, and its font covers
+> game already uses `^ @ # % $ & * + = ;` and `_`, and its font covers
 > `A-Z 0-9 . , ! ? : - / ' ( ) < > ~`, so pick something outside all of that.
 
 Afterwards, run `ADD-LETTER.bat` again — it reads that list out of the game, so
@@ -348,7 +348,7 @@ without the assistant knowing anything about this project.
 > 3. Paragraphs are separated by blank lines. Each becomes one page, so flag any
 >    paragraph longer than about 100 words.
 > 4. These characters cannot appear in the writing because the game reserves
->    them for emoji: `& # % $ * + = @ ^` and `_`. Flag any you find.
+>    them for emoji: `& # % $ * + = ; @ ^` and `_`. Flag any you find.
 >
 > Just tell me what to fix. Don't rewrite it unless I ask.
 >

@@ -201,7 +201,7 @@ Emoji are the exception, and they are real ones drawn by the reader's own
 device. They cannot be typed into a page directly — JavaScript measures and
 splits a string by UTF-16 unit, so one emoji counts as two characters and both
 the wrap and the per-character glyph list drift. Instead a page holds a
-one-character stand-in from the `EMOJI` map (`^ @ # % $ & * + =`), which has no
+one-character stand-in from the `EMOJI` map (`^ @ # % $ & * + = ;`), which has no
 glyph and so reserves an exact blank, and the real character is drawn into it.
 `widenEmoji` gives each one a second slot before wrapping so it has room to be
 read at the size of the writing.

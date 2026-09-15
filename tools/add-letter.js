@@ -154,35 +154,50 @@ function clean(raw, emoji, notes) {
     text = text.split(c).join('');
   }
 
-  // The emoji swap itself. Longest first, so a multi-part emoji is matched
-  // whole rather than having its first half taken by a shorter entry.
-  const byLength = [...emoji.toStandIn.keys()].sort((a, b) => b.length - a.length);
+  // The emoji swap, and the check for anything the font cannot draw, done one
+  // whole emoji at a time.
+  //
+  // Whole matters. Plenty of emoji are several emoji glued together with
+  // invisible joiners - the couple kissing is a woman, a heart, a kiss and a man.
+  // Walking the text a character at a time, or swapping known emoji wherever
+  // they occur, takes the heart out of the middle of that one and leaves the
+  // rest behind as four separate "unknown emoji", which is both wrong and
+  // impossible to act on. Intl.Segmenter splits text the way a phone does, so
+  // each thing she would see as one emoji is looked at as one.
+  //
+  // A missing variation selector (U+FE0F) is ignored when matching, because
+  // the same heart arrives with and without one depending on what it was typed
+  // on, and it is the same heart.
+  const bare = (s) => s.replace(/️/g, '');
+  const byBare = new Map([...emoji.toStandIn].map(([glyph, c]) => [bare(glyph), c]));
+  const allowed = new Set([...FONT_CHARS, ...FONT_CHARS.toLowerCase(), '\n']);
+  const unknownEmoji = new Set();
+  const unknownOther = new Set();
   let swapped = 0;
-  for (const glyph of byLength) {
-    const parts = text.split(glyph);
-    if (parts.length > 1) {
-      swapped += parts.length - 1;
-      text = parts.join(emoji.toStandIn.get(glyph));
+  let kept = '';
+  for (const { segment } of new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(text)) {
+    const standIn = byBare.get(bare(segment));
+    if (standIn) {
+      kept += standIn;
+      swapped += 1;
+      continue;
+    }
+    if (allowed.has(segment)) {
+      kept += segment;
+      continue;
+    }
+    // Past the ordinary punctuation blocks it is a pictograph or an emoji
+    // rather than a typo, so it is reported whole, the way she would see it.
+    if ([...segment].some((c) => c.codePointAt(0) > 0x2000)) {
+      unknownEmoji.add(segment);
+      continue;
+    }
+    for (const c of segment) {
+      if (allowed.has(c)) kept += c;
+      else unknownOther.add(c);
     }
   }
   if (swapped) notes.push(`swapped ${swapped} emoji for their stand-ins`);
-
-  // Whatever is left that the font cannot draw. Emoji are checked separately so
-  // they can be named properly; everything else is listed as-is.
-  const allowed = new Set([...FONT_CHARS, ...FONT_CHARS.toLowerCase(), ...emoji.standIns, '\n']);
-  const unknownEmoji = new Set();
-  const unknownOther = new Set();
-  let kept = '';
-  for (const ch of text) {
-    if (allowed.has(ch)) {
-      kept += ch;
-      continue;
-    }
-    // Anything outside the Basic Multilingual Plane, plus the symbol blocks, is
-    // an emoji or a pictograph rather than a typo.
-    if (ch.codePointAt(0) > 0x2000) unknownEmoji.add(ch);
-    else unknownOther.add(ch);
-  }
 
   return { text: kept, literals, unknownEmoji: [...unknownEmoji], unknownOther: [...unknownOther] };
 }
