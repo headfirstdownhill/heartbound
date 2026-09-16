@@ -68,6 +68,24 @@ if (TOKEN) {
   let button = null;
   let current = null; // { text, number }
 
+  // Phaser listens for keys on the window, so every key typed into the panel was
+  // also reaching the game behind it - and the menu starts the game on Enter, so
+  // pressing Enter for a new paragraph jumped to the character screen mid-letter.
+  //
+  // Two guards, because either alone can be defeated. The keyboard manager is
+  // switched off while the panel is open, and keys are stopped at the panel on
+  // the way out. Stopping them at the panel rather than at the window is the
+  // important part: the event still reaches the text box it was typed into, and
+  // only its journey onward to the game is cut.
+  const gameKeys = (on) => {
+    try {
+      if (window.game?.input?.keyboard) window.game.input.keyboard.enabled = on;
+    } catch {
+      // No game on the page, or not started yet. Nothing to switch off.
+    }
+  };
+  const holdKey = (ev) => ev.stopPropagation();
+
   const el = (tag, cls, text) => {
     const n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -240,11 +258,16 @@ if (TOKEN) {
     });
 
     const shut = () => {
+      ['keydown', 'keyup', 'keypress'].forEach((e) => panel.removeEventListener(e, holdKey));
       panel.remove();
       panel = null;
+      gameKeys(true);
     };
     closeBtn.addEventListener('click', shut);
     panel.addEventListener('keydown', (ev) => ev.key === 'Escape' && shut());
+
+    ['keydown', 'keyup', 'keypress'].forEach((e) => panel.addEventListener(e, holdKey));
+    gameKeys(false);
 
     document.body.appendChild(panel);
     panel.tabIndex = -1;

@@ -13,6 +13,12 @@ if errorlevel 1 goto nogit
 where node >nul 2>nul
 if errorlevel 1 goto nonode
 
+rem The site reads letters.json and copies it over the built-in letters, so a
+rem stale one would remove a letter rather than add it. Regenerating both is the
+rem check: if anything is wrong it says so and stops.
+node tools\add-letter.js --verify >nul
+if errorlevel 1 goto outofstep
+
 rem Anything at all, including files git has never seen before - a brand new
 rem letter is one of those, and a check for changed-tracked-files only would
 rem call that "nothing to publish".
@@ -62,6 +68,13 @@ echo.
 echo   If the page looks the same at first, that is normal - your
 echo   phone or browser is showing you the old copy. Pull down to
 echo   refresh it, or wait a few minutes.
+echo.
+goto end
+
+:outofstep
+echo   PROBLEM: the letters are not in step, so nothing was published.
+echo.
+node tools\add-letter.js --verify
 echo.
 goto end
 

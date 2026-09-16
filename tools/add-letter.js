@@ -272,12 +272,39 @@ function build({ write = true } = {}) {
       };
     }
     fs.writeFileSync(OUT_JSON, JSON.stringify({ emoji, letters: asData }, null, 1), 'utf8');
+
+    // The two files have to agree, and the cost of them not agreeing is the
+    // whole point of this check: the site reads letters.json and copies it over
+    // the built-in letters, so a stale letters.json does not just fail to add a
+    // letter - it actively removes one that letterData.js had. That is exactly
+    // what happened once, when a long-running drop server was still holding an
+    // older copy of this file in memory and only wrote one of the two.
+    //
+    // Cheap to verify, so verify rather than trust.
+    const written = JSON.parse(fs.readFileSync(OUT_JSON, 'utf8'));
+    const inJson = Object.keys(written.letters).sort().join(',');
+    const expected = letters.map((l) => l.id).sort().join(',');
+    if (inJson !== expected) {
+      throw new Error(
+        'js/data/letterData.js and js/data/letters.json came out different.\n' +
+          `  letters.json has: ${inJson || '(none)'}\n` +
+          `  it should have:   ${expected}\n` +
+          'Nothing has been published. Run ADD-LETTER.bat, which always writes both.',
+      );
+    }
   }
 
   return { letters, problems, warnings, registry, files };
 }
 
 function main() {
+  // Used by PUBLISH.bat before it commits anything. Regenerating is the check:
+  // if the two files disagree, build() throws and nothing goes out.
+  if (process.argv.includes('--verify')) {
+    build();
+    return;
+  }
+
   if (process.argv.includes('--message')) {
     console.log(commitMessage());
     return;

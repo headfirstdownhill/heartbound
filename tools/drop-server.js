@@ -220,7 +220,28 @@ function addLetter(text, number) {
   return { ok: true, number, total: result.letters.length, built, learned: check.learned };
 }
 
+// The site reads letters.json and copies it over the built-in letters, so the
+// two must agree before anything goes out. If they do not, publishing would
+// remove a letter from the shelf rather than add one - which is how a letter
+// once appeared to vanish after being added successfully.
+function checkInStep() {
+  const asJson = JSON.parse(fs.readFileSync(path.join(ROOT, 'js', 'data', 'letters.json'), 'utf8'));
+  const asModule = fs.readFileSync(path.join(ROOT, 'js', 'data', 'letterData.js'), 'utf8');
+  const inJson = Object.keys(asJson.letters).sort();
+  const inModule = [...asModule.matchAll(/^ {2}(letter\d+): \{/gm)].map((m) => m[1]).sort();
+  if (inJson.join(',') === inModule.join(',')) return null;
+  return (
+    'The two copies of the letters do not match, so nothing was published.\n' +
+    `  letters.json has:   ${inJson.join(' ') || '(none)'}\n` +
+    `  letterData.js has:  ${inModule.join(' ') || '(none)'}\n` +
+    'Close this window, double-click DROP-LETTER.bat again, and re-add the letter.'
+  );
+}
+
 function publish() {
+  const mismatch = checkInStep();
+  if (mismatch) return { ok: false, error: mismatch };
+
   const status = git(['status', '--porcelain', '-uall']).trim();
   if (!status) return { ok: false, error: 'Nothing has changed since the last time, so there is nothing to publish.' };
 

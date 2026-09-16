@@ -101,6 +101,17 @@
     "I love you, and I love you dearly forever my love. You're forever my heart ^",
     "I love you Jory, my beautiful jellyfish."
    ]
+  },
+  "letter6": {
+   "title": "Letter 6",
+   "date": "saturday 19/04/2026",
+   "cover": 16234187,
+   "coverDark": 14716846,
+   "bound": false,
+   "icon": "letter_closed",
+   "pages": [
+    "hello hi hello"
+   ]
   }
  }
 }
