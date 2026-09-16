@@ -112,6 +112,16 @@
    "pages": [
     "hello hi hello"
    ]
+  },
+  "letter7": {
+   "title": "Letter 7",
+   "cover": 16234187,
+   "coverDark": 14716846,
+   "bound": false,
+   "icon": "letter_closed",
+   "pages": [
+    "hello hi i love you jory as d asd as da sd asd asd as das d asd sad as das das d"
+   ]
   }
  }
 }

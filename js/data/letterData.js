@@ -147,4 +147,14 @@ export const LETTER_BOOKS = {
       "hello hi hello",
     ],
   },
+  letter7: {
+    title: 'Letter 7',
+    cover: 0xf7b6cb,
+    coverDark: 0xe08fae,
+    bound: false,
+    icon: 'letter_closed',
+    pages: [
+      "hello hi i love you jory as d asd as da sd asd asd as das d asd sad as das das d",
+    ],
+  },
 };
