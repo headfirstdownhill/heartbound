@@ -5,8 +5,21 @@ Every letter in the game is one file in this folder. That is all they are.
 Plain text, nothing clever, nothing you can break by typing in it.
 
 
-TO ADD A NEW ONE
-----------------
+THE EASY WAY
+------------
+
+Go up one folder and double-click  DROP-LETTER.bat
+
+The game opens. Press  Ctrl + Alt + B  and a button appears in the
+bottom-right. Click it, drag his .txt file onto the panel, look at the
+preview, then press ADD and PUBLISH.
+
+You do not need this folder at all for that - it puts the file here
+for you.
+
+
+THE OLDER WAY, BY HAND
+----------------------
 
 1. Right-click _TEMPLATE.txt and choose Copy. Right-click in the empty
    space in this folder and choose Paste.

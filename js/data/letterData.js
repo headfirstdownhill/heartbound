@@ -9,8 +9,7 @@
 // His words are untouched bar the things the pixel font cannot draw: the curly
 // apostrophes his keyboard types are the straight ones here and render
 // identically, and each emoji is the one-character stand-in that reserves a
-// blank for the real one to be drawn into. See the EMOJI table in
-// js/scenes/BookScene.js.
+// blank for the real one to be drawn into. See js/data/emojiData.js.
 //
 // 'bound: false' is what makes each of these a letter rather than a book: it
 // gives it the envelope to come out of, and takes away the spine, because a

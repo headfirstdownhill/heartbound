@@ -5,6 +5,7 @@ import { PixelText } from '../gfx/PixelText.js';
 import { MenuButton, drawChunkyPanel, meadowBackdrop } from '../ui/MenuWidgets.js';
 import { wrapText } from '../ui/SpeechBubble.js';
 import { LETTER_BOOKS } from '../data/letterData.js';
+import { EMOJI } from '../data/emojiData.js';
 
 // What the book says, in order — one string per page.
 //
@@ -168,40 +169,23 @@ const SCHOOL_PAGES = [
 // His words are untouched otherwise, and where a page ends is still his: a
 // blank line in the text file is a page break, and nothing else is.
 
-// The real emoji he wrote, keyed by the stand-in that sits in the page text.
+// The real emoji he wrote, keyed by the stand-in that sits in the page text,
+// comes in from js/data/emojiData.js - which the letter tool writes and adds to
+// by itself. See that file for why a stand-in is needed at all, and why the
+// first twelve of them can never move.
 //
-// The emoji cannot go in the string itself. JavaScript measures and splits a
-// string by UTF-16 unit, so one emoji counts as two characters — the wrap would
-// drift, and the per-character glyph list the page is built from would no
-// longer line up with the text. A stand-in keeps that one-to-one: one character
-// in the page, one slot on the paper.
-//
-// None of these are in the font table, so each one sets a blank of exactly the
-// right width and the real emoji is drawn into it by the system font. That is
-// deliberate — they render in whatever she is reading on, which is the point.
-const EMOJI = {
-  '^': '❤️',
-  '@': '😁',
-  '#': '😎',
-  '%': '🤬',
-  '$': '🤤',
-  '&': '😉',
-  '*': '🥳',
-  '+': '🪼',
-  '=': '😋',
-  ';': '💏',
-  '|': '🤔',
-  '{': '😴',
-};
 // Whatever the device has. Every platform ships exactly one of these, so the
 // first that resolves is the native set; the last is there only so a machine
 // with none of them still measures something.
 const EMOJI_FONT =
   '"Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Twemoji Mozilla", sans-serif';
-// The blank that widens a stand-in to two slots, and the stand-ins themselves.
-// See widenEmoji for why the filler is not a space.
+// The blank that widens a stand-in to two slots. See widenEmoji for why the
+// filler is not a space.
 const EMOJI_PAD = '_';
-const EMOJI_KEYS = /[\^@#%$&*+=;|{]/g;
+// The stand-ins themselves, as a set rather than the character class this used
+// to be. Most of them are now Private Use characters picked by the tool, and a
+// regex built by hand out of those is an escaping bug waiting to happen.
+const EMOJI_KEYS = new Set(Object.keys(EMOJI));
 // Sized to the pair of slots it now owns. Two advances is 26px, and an emoji is
 // about 1.37 times as wide as its font size, so 18px lands at 25px and sits
 // inside its own space. The artwork inside an emoji does not fill its box, so
@@ -930,7 +914,9 @@ export class BookScene extends Phaser.Scene {
   // middle of itself. '_' has no glyph, so it sets an empty slot exactly like a
   // space would, but the wrapper reads the run as one unbreakable word.
   widenEmoji(text) {
-    return text.replace(EMOJI_KEYS, (c) => `${c}${EMOJI_PAD}`);
+    let out = '';
+    for (const c of text) out += EMOJI_KEYS.has(c) ? `${c}${EMOJI_PAD}` : c;
+    return out;
   }
 
   // The spine down the gutter: a band in the cover colour, crossed by the same

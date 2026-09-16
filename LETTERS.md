@@ -1,23 +1,51 @@
 # How to add a letter
 
 This is the whole thing, assuming you have never edited a file in this project
-and do not want to learn how. **You will not touch any code.** You type his
-letter into a text file and double-click two things.
+and do not want to learn how. **You will not touch any code.**
 
-If you only ever read one part of this, read [The five steps](#the-five-steps).
-Everything after it is there for the day something doesn't go to plan.
+There are two ways to add a letter. **The drop page is the easy one** — use that.
+The older way is written up further down, and it still works if the drop page
+ever gives you trouble.
 
 ---
 
-## The five steps
+## The drop page
 
-1. **Copy** `letters/_TEMPLATE.txt` and rename the copy `letter3.txt`
+1. **Double-click `DROP-LETTER.bat`.** A black window opens and stays open, and
+   the game opens in your browser. Leave the black window alone.
+2. **Press Ctrl + Alt + B.** A pink **ADD A LETTER** button appears in the
+   bottom-right corner. Nothing is there until you press it.
+3. **Click the button.** A panel opens.
+4. **Drag his `.txt` file anywhere onto the panel.** Or click the dashed box to
+   pick a file, or paste his message straight into the text box.
+5. **Look at the preview.** Every page of the letter is drawn as a sheet of
+   paper, with his emoji, broken into lines exactly where the game will break
+   them. Under each sheet is how full it is, like `7/20`.
+6. **Press ADD TO THE GAME.** Nothing is online yet.
+7. **Press PUBLISH.** It puts it on the website and then *waits and checks* —
+   it will tell you when it is genuinely live rather than guessing.
+8. **Close the black window** when you are done.
+
+That's it. If something is wrong with the letter it tells you in plain words
+before anything is saved, and changes nothing.
+
+> **Why a black window has to stay open:** the page can only add letters because
+> a small helper is running on your computer. The website on its own cannot —
+> see [Why the website can't do this by itself](#why-the-website-cant-do-this-by-itself).
+
+---
+
+## The older way, without the drop page
+
+1. **Copy** `letters/_TEMPLATE.txt` and rename the copy `letter6.txt`
 2. **Type** the date on the first line, then paste his message underneath
 3. **Double-click** `ADD-LETTER.bat`
 4. **Double-click** `heartbound.html` and read the letter to check it
 5. **Double-click** `PUBLISH.bat`
 
-That's it. That's the entire process, forever, however many letters there are.
+Everything below describes this route in detail. All of it still applies to the
+drop page too — the rules about dates, blank lines and emoji are the same, because
+both use exactly the same machinery underneath.
 
 ---
 
@@ -33,9 +61,10 @@ Inside it, the only four things you ever need:
 
 | | |
 |---|---|
-| 📁 **`letters`** | A folder. One text file per letter. This is where you work. |
-| ▶️ **`ADD-LETTER.bat`** | Double-click to put your letters into the game. |
-| ▶️ **`PUBLISH.bat`** | Double-click to put the game online. |
+| ▶️ **`DROP-LETTER.bat`** | The easy way. Opens the game with the drop page behind Ctrl+Alt+B. |
+| 📁 **`letters`** | A folder. One text file per letter. This is where they are kept. |
+| ▶️ **`ADD-LETTER.bat`** | The older way: puts the letters in `letters` into the game. |
+| ▶️ **`PUBLISH.bat`** | The older way: puts the game online. |
 | 🎮 **`heartbound.html`** | Double-click to play/read it on this computer. |
 
 Everything else in that folder is the game itself. You never need to open any of
@@ -250,6 +279,41 @@ These don't stop anything. It saved your letter and is telling you something.
 | **"could not be sent to the website"** | Usually no internet, or GitHub asking who you are. Check the connection and run `PUBLISH.bat` again — it's safe to run twice and picks up where it left off. |
 | **"Nothing has changed since last time"** | You haven't added anything since you last published, or you forgot `ADD-LETTER.bat`. |
 
+### The drop page
+
+| What happens | What to do |
+|---|---|
+| **Ctrl+Alt+B does nothing** | You are looking at the real website, not the one on your computer. Double-click   ==========================================
+    ADD A LETTER
+  ==========================================
+
+
+  It stopped unexpectedly. The message above says why.
+
+  If it says the address is already in use, this is already running in
+  another window - use that one, or close it and try again.
+
+  You can always fall back to ADD-LETTER.bat and PUBLISH.bat instead.
+
+Press any key to continue . . .  and use the page it opens. |
+| **The page won't load at all** | The black window is closed. Double-click   ==========================================
+    ADD A LETTER
+  ==========================================
+
+
+  It stopped unexpectedly. The message above says why.
+
+  If it says the address is already in use, this is already running in
+  another window - use that one, or close it and try again.
+
+  You can always fall back to ADD-LETTER.bat and PUBLISH.bat instead.
+
+Press any key to continue . . .  again. |
+| **It says the address is already in use** | It is already running in another black window. Use that one, or close it and start again. |
+| **ADD does nothing / the panel is stuck** | Close the panel, press Ctrl+Alt+B twice, and drop the file again. Nothing is saved until ADD says it saved, so nothing is half-done. |
+| **PUBLISH says the website has not updated yet** | It was sent, GitHub is just slow. Wait a few minutes and open the link. Nothing is lost. |
+| **You want to start over** | Close the panel and drop the file again. Until you press ADD, nothing has been written anywhere. |
+
 ### The black window closes instantly
 
 It's finished and closed too fast to read. Both files end with "Press any key to
@@ -275,38 +339,46 @@ rest carry on working perfectly; the list just goes 6, 4, 3.
 
 ## A new emoji
 
-When the tool says it doesn't know an emoji, it's because this is the one thing
-that does need a change inside the game. You have two options.
+**Nothing to do.** The game teaches itself any emoji it has not seen before, and
+tells you it did:
 
-**The easy option:** take that emoji out of the letter file, or swap it for one
-the game already knows:
+```
+   taught the game 1 new emoji:  🥰
+```
 
-> ❤️ 😁 😎 🤬 🤤 😉 🥳 🪼 😋 💏 🤔 😴
+It picks an invisible character to stand in for it, out of a set of 6,400 that
+no font draws and no keyboard types, and remembers it. There is no limit, and it
+never needs anyone to edit the game.
 
-**The proper option:** have it added to the game. It's a small change, but it is
-code. Paste this into any AI chat, along with the emoji it named:
+This used not to be true — each new emoji had to be added by hand from a pool of
+punctuation marks that was nearly used up, which is why some letters used to stop
+dead. If you ever see a message saying an emoji is not known, something is wrong;
+use the "Something went wrong" prompt below.
 
-> I have a small web game in a folder on my Windows computer. I need to add
-> support for a new emoji. There's a file at `js/scenes/BookScene.js` with a
-> list in it that looks like this:
->
-> ```
-> const EMOJI = {
->   '^': '❤️',
->   '@': '😁',
-> };
-> const EMOJI_KEYS = /[\^@#%$&*+]/g;
-> ```
->
-> I need to add the emoji ⟨PASTE THE EMOJI HERE⟩ to it. Please tell me, in very
-> simple steps, exactly what to type and where. I have never edited code before.
-> Note that I need to add it to BOTH the list AND the `EMOJI_KEYS` line, and the
-> character I pick must be one that has no letter shape in the game's font — the
-> game already uses `^ @ # % $ & * + = ; | {` and `_`, and its font covers
-> `A-Z 0-9 . , ! ? : - / ' ( ) < > ~`, so pick something outside all of that.
+> **One exception**, and it is about characters he *types*, not emoji he sends.
+> Twelve ordinary keyboard characters are reserved as stand-ins for the original
+> twelve emoji: `^ @ # % $ & * + = ; | {`. If he types one in a letter — a
+> literal `&`, or `100%` — it gets reworded or removed, and it tells you so.
+> Everything the game has learned since sits outside the keyboard entirely, so
+> this list will never grow.
 
-Afterwards, run `ADD-LETTER.bat` again — it reads that list out of the game, so
-it'll pick up the new one on its own.
+---
+
+## Why the website can't do this by itself
+
+Worth knowing, because it explains the black window.
+
+Adding a letter means changing what is stored on GitHub. Anything that can do
+that needs a GitHub key. Your website is a plain static site — every line of it
+can be read by anyone who opens it, so a key put there would be readable too, and
+a password in front of it would not help, because the password would be sitting
+right there as well.
+
+On **this computer** there is no such problem: GitHub already knows this machine.
+So the drop page runs here, borrows that, and no key exists anywhere to be found
+or stolen. That is why `DROP-LETTER.bat` has to be running, and why pressing
+Ctrl+Alt+B on the real website does nothing at all — there is no button there,
+and no code for one.
 
 ---
 
