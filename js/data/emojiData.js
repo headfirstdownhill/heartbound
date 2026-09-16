@@ -42,8 +42,8 @@ export const EMOJI = {
   '{': '😴',
 };
 
-// The twelve above, and only those, are characters he could actually type. A
-// stand-in that is reachable from a keyboard has to be taken out of his writing
-// before the swap, or a '&' he wrote comes out as a wink. Everything assigned
+// The twelve above, and only those, are characters you could actually type. A
+// stand-in that is reachable from a keyboard has to be taken out of your writing
+// before the swap, or a '&' you wrote comes out as a wink. Everything assigned
 // after this point is unreachable, so it never needs that treatment.
 export const TYPEABLE_STAND_INS = '^@#%$&*+=;|{';

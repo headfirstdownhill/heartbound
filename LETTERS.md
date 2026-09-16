@@ -16,10 +16,10 @@ ever gives you trouble.
 2. **Press Ctrl + Alt + B.** A pink **ADD A LETTER** button appears in the
    bottom-right corner. Nothing is there until you press it.
 3. **Click the button.** A panel opens.
-4. **Drag his `.txt` file anywhere onto the panel.** Or click the dashed box to
-   pick a file, or paste his message straight into the text box.
+4. **Drag your `.txt` file anywhere onto the panel.** Or click the dashed box to
+   pick a file, or paste your message straight into the text box.
 5. **Look at the preview.** Every page of the letter is drawn as a sheet of
-   paper, with his emoji, broken into lines exactly where the game will break
+   paper, with your emoji, broken into lines exactly where the game will break
    them. Under each sheet is how full it is, like `7/20`.
 6. **Press ADD TO THE GAME.** Nothing is online yet.
 7. **Press PUBLISH.** It puts it on the website and then *waits and checks* —
@@ -38,7 +38,7 @@ before anything is saved, and changes nothing.
 ## The older way, without the drop page
 
 1. **Copy** `letters/_TEMPLATE.txt` and rename the copy `letter6.txt`
-2. **Type** the date on the first line, then paste his message underneath
+2. **Type** the date on the first line, then paste your message underneath
 3. **Double-click** `ADD-LETTER.bat`
 4. **Double-click** `heartbound.html` and read the letter to check it
 5. **Double-click** `PUBLISH.bat`
@@ -112,9 +112,9 @@ Day name, space, then day/month/year with slashes. **The day name has to match
 the real date.** If you get it wrong, the tool tells you and says exactly what it
 should have been — so it's not something you need to be careful about.
 
-### A blank line, then his message
+### A blank line, then your message
 
-Press Enter twice after the date, then paste what he wrote.
+Press Enter twice after the date, then paste what you wrote.
 
 ```
 Saturday 12/09/2026
@@ -139,14 +139,14 @@ middle of it.
 
 ### Things you do NOT need to worry about
 
-**Paste his message exactly as he sent it. Don't tidy it up.**
+**Paste your message exactly as you sent it. Don't tidy it up.**
 
 The tool handles all of this by itself, and tells you what it did:
 
-- Curly apostrophes (the `’` his phone types) → fixed automatically
+- Curly apostrophes (the `’` a phone types) → fixed automatically
 - Long dashes `—` and `…` → fixed automatically
-- **Emoji** → handled automatically. Paste them in as he sent them.
-- Capitals, spelling, his punctuation → left exactly alone
+- **Emoji** → handled automatically. Paste them in as you sent them.
+- Capitals, spelling, your punctuation → left exactly alone
 
 **Now save it.** In Notepad: **File** → **Save**. Or press **Ctrl+S**.
 
@@ -250,8 +250,8 @@ list, nothing has been changed and the game still works.**
 | What it says | What to do |
 |---|---|
 | **"…is not named the way this tool expects"** | Rename the file. It has to be `letter` then a number then `.txt`, like `letter3.txt`. |
-| **"…is empty"** | You saved a blank file. Open it and put the date and his message in. |
-| **"…has a date but no message under it"** | Press Enter twice after the date, then paste his message. |
+| **"…is empty"** | You saved a blank file. Open it and put the date and your message in. |
+| **"…has a date but no message under it"** | Press Enter twice after the date, then paste your message. |
 | **"…uses N emoji the game does not know yet"** | See [A new emoji](#a-new-emoji) below. It names exactly which ones. |
 | **"Two files are both letter 3"** | You have two files with the same number. Rename one. |
 | **"There are no letters in the letters folder yet"** | Your file isn't in the `letters` folder, or isn't named right. |
@@ -265,8 +265,8 @@ These don't stop anything. It saved your letter and is telling you something.
 |---|---|
 | **"12/09/2026 was a Saturday, not a Monday"** | The day name doesn't match the date. It tells you the right one — fix the first line of the file and run it again. |
 | **"the date … is not in the expected shape"** | Write it as `Saturday 12/09/2026`. It used what you typed anyway. |
-| **"removed 1 '#' that he typed"** | A few keyboard characters are reserved for emoji, so they can't appear in the writing. `&` becomes "and" by itself; the others are removed. If one mattered, reword that line. |
-| **"removed characters the writing cannot show"** | Something in his message has no letter shape in the game's font. It names them. Usually harmless. |
+| **"removed 1 '#' that you typed"** | A few keyboard characters are reserved for emoji, so they can't appear in the writing. `&` becomes "and" by itself; the others are removed. If one mattered, reword that line. |
+| **"removed characters the writing cannot show"** | Something in your message has no letter shape in the game's font. It names them. Usually harmless. |
 | **"paragraph 2 is too long for one page"** | Fine to ignore. If you'd rather choose where it breaks, put a blank line in the middle of that paragraph. |
 
 ### The black window says PROBLEM
@@ -329,7 +329,7 @@ certainly fine. Check with step 4.
 
 **To remove one:** delete its file, then double-click `ADD-LETTER.bat`.
 
-> ⚠️ The text file is the **only** copy of his words once it's in there. If you
+> ⚠️ The text file is the **only** copy of your words once it's in there. If you
 > might want it back one day, drag it somewhere else instead of deleting it.
 
 **The numbers don't have to be in a neat row.** If you delete `letter5.txt` the
@@ -355,9 +355,9 @@ punctuation marks that was nearly used up, which is why some letters used to sto
 dead. If you ever see a message saying an emoji is not known, something is wrong;
 use the "Something went wrong" prompt below.
 
-> **One exception**, and it is about characters he *types*, not emoji he sends.
+> **One exception**, and it is about characters you *type*, not emoji you use.
 > Twelve ordinary keyboard characters are reserved as stand-ins for the original
-> twelve emoji: `^ @ # % $ & * + = ; | {`. If he types one in a letter — a
+> twelve emoji: `^ @ # % $ & * + = ; | {`. If you type one in a letter — a
 > literal `&`, or `100%` — it gets reworded or removed, and it tells you so.
 > Everything the game has learned since sits outside the keyboard entirely, so
 > this list will never grow.
@@ -387,7 +387,7 @@ and no code for one.
 Copy-paste these into any AI chat. Each one is written to work on its own,
 without the assistant knowing anything about this project.
 
-### Turn his message into a letter file
+### Turn your message into a letter file
 
 > I need you to reformat a message into a plain text file for me. The rules:
 >
@@ -399,7 +399,7 @@ without the assistant knowing anything about this project.
 >    becomes one page, so aim for paragraphs of roughly 40 to 80 words — split
 >    anything much longer at a sentence end, and keep short related thoughts
 >    together.
-> 4. Do not change his words, spelling, capitals or punctuation in any other
+> 4. Do not change your words, spelling, capitals or punctuation in any other
 >    way. Keep the emoji exactly as they are.
 > 5. Give me the result in a single code block so I can copy all of it at once.
 >
@@ -407,7 +407,7 @@ without the assistant knowing anything about this project.
 >
 > The message is:
 >
-> ⟨PASTE HIS MESSAGE⟩
+> ⟨PASTE YOUR MESSAGE⟩
 
 ### Check a letter before I use it
 
@@ -477,7 +477,7 @@ be done by hand:
   stand-in character that takes up exactly one space, and the real emoji is
   drawn into that gap when she reads it — using her own phone's emoji, which is
   why they look right on whatever she's holding.
-- Because those stand-ins are ordinary keyboard characters, a `&` he actually
+- Because those stand-ins are ordinary keyboard characters, a `&` you actually
   typed would come out as 😉. That's why a few characters get removed or
   reworded, and why it tells you when it does.
 

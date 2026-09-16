@@ -9,11 +9,11 @@ import { EMOJI } from '../data/emojiData.js';
 
 // What the book says, in order — one string per page.
 //
-// The words are his, kept exactly as written, bar one slip of the finger. Only
+// The words are yours, kept exactly as written, bar one slip of the finger. Only
 // the breaks are a choice: they land on a sentence end wherever the writing
 // allowed it and on a clause where it did not, balanced so every page carries
 // about the same amount and none is crammed or left nearly bare. The only
-// thing here with no character behind it is the heart he signed off with,
+// thing here with no character behind it is the heart you signed off with,
 // which is why the last page ends on '~' — see the note in the font table.
 //
 // A string is a page. If one ever grows past what a sheet holds the reader
@@ -83,16 +83,16 @@ const PAGES = [
 
 // The second book, written the night before she went back to school.
 //
-// Same rules as above: his words, his order, his line of thought. The only
+// Same rules as above: your words, your order, your line of thought. The only
 // changes are the ones a pen would have made anyway — 'im' to 'I'm', 'dont' to
 // 'don't', a lowercase 'i' to 'I'. Nothing rephrased, nothing tidied, nothing
 // added.
 //
-// The emoji are his too, and they are the real ones — '^' '@' '#' '%' '$' '&'
+// The emoji are yours too, and they are the real ones — '^' '@' '#' '%' '$' '&'
 // '*' are stand-ins that the page swaps for the actual character, drawn by
 // whatever emoji font the device has. See EMOJI below for why they cannot just
-// be typed in here. One stand-in is one emoji, so the runs he wrote survive at
-// the length he wrote them and still fit the column.
+// be typed in here. One stand-in is one emoji, so the runs you wrote survive at
+// the length you wrote them and still fit the column.
 const SCHOOL_PAGES = [
   "Hi my baby, I was thinking of giving this to you while you're sleeping, but since this message is related to your school, I don't want to send it to you while you're sleeping and let this be the first thing you read.",
 
@@ -159,17 +159,17 @@ const SCHOOL_PAGES = [
 // letters/, and tools/add-letter.js turns them into js/data/letterData.js,
 // which is where they arrive from.
 //
-// That is so one can be added without touching code at all: paste what he
+// That is so one can be added without touching code at all: paste what you
 // wrote into a text file, double-click ADD-LETTER.bat, and it is in the game.
 // The tool does the two things that are easy to get wrong by hand - the curly
-// apostrophes his keyboard types, which the font has no glyph for and which
+// apostrophes a phone keyboard types, which the font has no glyph for and which
 // come out as a hole in the middle of a word, and the emoji, which cannot sit
 // in a page string and have to be the stand-ins from the EMOJI table below.
 //
-// His words are untouched otherwise, and where a page ends is still his: a
+// Your words are untouched otherwise, and where a page ends is still yours: a
 // blank line in the text file is a page break, and nothing else is.
 
-// The real emoji he wrote, keyed by the stand-in that sits in the page text,
+// The real emoji you wrote, keyed by the stand-in that sits in the page text,
 // comes in from js/data/emojiData.js - which the letter tool writes and adds to
 // by itself. See that file for why a stand-in is needed at all, and why the
 // first twelve of them can never move.
@@ -228,7 +228,7 @@ const BOOKS = {
 // The letters used to sit here one by one. That works until there are five or
 // six of them and then it does not: the shelf grows a third row, the row pushes
 // the buttons down, and the last one goes off the bottom of an 800-tall screen.
-// He writes one every school day, so that was a wall with a date on it. They
+// You write one every school day, so that was a wall with a date on it. They
 // have their own screen now and the shelf never moves again.
 const SHELF = [
   { book: 'beautiful', label: 'BOOK 1' },
@@ -667,7 +667,7 @@ export class BookScene extends Phaser.Scene {
 
   // ---- the letters ---------------------------------------------------------
 
-  // Every letter he has written, a screenful at a time.
+  // Every letter you have written, a screenful at a time.
   //
   // This screen exists because the shelf could not hold them. A letter a school
   // day is a number with no ceiling, and a grid of panels has one at about six.
@@ -1060,7 +1060,7 @@ export class BookScene extends Phaser.Scene {
   // The real emoji, dropped into the blanks their stand-ins left behind.
   //
   // Drawn by the device's own font rather than out of the sprite sheet, so she
-  // gets the faces her phone draws — the ones he meant — instead of somebody's
+  // gets the faces her phone draws — the ones you meant — instead of somebody's
   // idea of them in five pixels.
   //
   // They go inside the line's own container, which is what makes this cheap:
@@ -1150,7 +1150,7 @@ export class BookScene extends Phaser.Scene {
       this.track(t.setDepth(402));
       this.fadeIn(t.container, 160 + i * 110);
 
-      // The heart he signed off with, in red. PixelText tints a whole string at
+      // The heart you signed off with, in red. PixelText tints a whole string at
       // once, so this reaches for the single glyph that should not be ink —
       // safe because book pages are set once and never re-typed.
       const heart = line.indexOf('~');

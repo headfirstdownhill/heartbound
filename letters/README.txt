@@ -11,7 +11,7 @@ THE EASY WAY
 Go up one folder and double-click  DROP-LETTER.bat
 
 The game opens. Press  Ctrl + Alt + B  and a button appears in the
-bottom-right. Click it, drag his .txt file onto the panel, look at the
+bottom-right. Click it, drag your .txt file onto the panel, look at the
 preview, then press ADD and PUBLISH.
 
 You do not need this folder at all for that - it puts the file here
@@ -33,14 +33,14 @@ THE OLDER WAY, BY HAND
 
 3. Open it (double-click, or right-click and Open with Notepad).
 
-4. First line is the date he sent it, like this:
+4. First line is the date you sent it, like this:
 
        Saturday 12/09/2026
 
    The day name has to match the actual date. If you get it wrong the
    tool tells you and says what it should be.
 
-5. Leave a blank line, then paste what he wrote.
+5. Leave a blank line, then paste what you wrote.
 
 6. Put a blank line between paragraphs. EACH PARAGRAPH BECOMES ONE PAGE
    of the letter. That is the only rule, and it means where the pages
@@ -54,7 +54,7 @@ THE OLDER WAY, BY HAND
 THINGS YOU DO NOT NEED TO WORRY ABOUT
 -------------------------------------
 
-Paste his message exactly as he sent it. Do not try to tidy it up.
+Paste your message exactly as you sent it. Do not try to tidy it up.
 
 The tool sorts out the curly apostrophes, the long dashes, and the
 emoji all by itself, and tells you what it did. You do not need to
@@ -73,7 +73,7 @@ TO REMOVE A LETTER
 
 Delete its file, then double-click ADD-LETTER.bat again.
 
-Careful: that is the only copy of his words. If you might want it back
+Careful: that is the only copy of your words. If you might want it back
 one day, move the file somewhere else instead of deleting it.
 
 

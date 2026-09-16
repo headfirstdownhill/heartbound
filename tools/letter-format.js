@@ -1,4 +1,4 @@
-// The rules for turning what he wrote into what the game can draw.
+// The rules for turning what you wrote into what the game can draw.
 //
 // One copy of them, used by tools/add-letter.js and by the drop page in
 // tools/drop-server.js. They used to live only in add-letter.js; the moment a
@@ -57,8 +57,8 @@ function readRegistry() {
   return {
     toStandIn,
     standIns,
-    // Only these can appear in something he typed, so only these need taking out
-    // of his writing before the swap.
+    // Only these can appear in something you typed, so only these need taking
+    // out of your writing before the swap.
     typeable: typeable ? typeable[1] : '',
   };
 }
@@ -122,9 +122,9 @@ const REGISTRY_HEADER = `// GENERATED FILE - do not edit it by hand.
 // keeps whatever character it is first given, so these are stable across runs.
 `;
 
-const TYPEABLE_NOTE = `// The twelve above, and only those, are characters he could actually type. A
-// stand-in that is reachable from a keyboard has to be taken out of his writing
-// before the swap, or a '&' he wrote comes out as a wink. Everything assigned
+const TYPEABLE_NOTE = `// The twelve above, and only those, are characters you could actually type. A
+// stand-in that is reachable from a keyboard has to be taken out of your writing
+// before the swap, or a '&' you wrote comes out as a wink. Everything assigned
 // after this point is unreachable, so it never needs that treatment.
 `;
 
@@ -194,7 +194,7 @@ function checkDate(date) {
 
 // ---- the conversion --------------------------------------------------------
 
-// Everything done to his words, in order, each one reported so nothing is
+// Everything done to your words, in order, each one reported so nothing is
 // changed behind her back.
 //
 // `registry` is modified in place when an emoji it has never seen turns up: it
@@ -224,7 +224,7 @@ function clean(raw, registry) {
   if (dashes) notes.push(`shortened ${dashes} long dash${dashes === 1 ? '' : 'es'}`);
   if (ellipses) notes.push(`spelled out ${ellipses} ellipsis${ellipses === 1 ? '' : 'es'}`);
 
-  // Literal stand-in characters, dealt with BEFORE the swap so a '&' he typed is
+  // Literal stand-in characters, dealt with BEFORE the swap so a '&' you typed is
   // never mistaken for one this put there. '&' has an obvious reading; the rest
   // do not, so they go, loudly. Only the twelve keyboard ones can occur at all.
   const ampersands = count(/&/g);
@@ -302,19 +302,35 @@ function clean(raw, registry) {
 
 // Splits a whole letter file into its date and its pages, and says everything
 // worth saying about it. Does not touch disk.
+// Takes a text file exactly as it comes and works out what is in it. There is no
+// format to get right and nothing to remember.
+//
+// A date on the first line is offered, not demanded: if the first line happens to
+// look like one, it becomes the date stamped on the first sheet and the rest is
+// the letter. If it does not, the whole file is the letter and it simply has no
+// date on it - the page only stamps one where there is one to stamp.
+//
+// This used to insist on a date line and refuse anything without one, which made
+// a plain text file the wrong shape for no good reason.
 function parseLetter(raw) {
-  const body = String(raw).replace(/\r\n?/g, '\n');
-  const lines = body.split('\n');
-  let i = 0;
-  while (i < lines.length && lines[i].trim() === '') i += 1;
-  if (i >= lines.length) return { error: 'empty' };
+  const text = String(raw)
+    .replace(/\r\n?/g, '\n')
+    .replace(/^﻿/, '') // a byte-order mark, which Notepad can leave behind
+    .trim();
+  if (!text) return { error: 'empty' };
 
-  const date = lines[i].trim();
-  const rest = lines.slice(i + 1).join('\n').trim();
-  if (!rest) return { error: 'no-message', date };
+  const lines = text.split('\n');
+  const first = lines[0].trim();
+  const rest = lines.slice(1).join('\n').trim();
 
-  return { date, body: rest };
+  // Only a whole line that is just a date counts, so a letter opening with
+  // "Monday was lovely" keeps its first line as writing.
+  if (DATE_SHAPE.test(first) && rest) return { date: first, body: rest };
+
+  return { date: null, body: text };
 }
+
+const DATE_SHAPE = /^[A-Za-z]+\s+\d{1,2}\/\d{1,2}\/\d{2,4}$/;
 
 // A blank line is a page break. That is the only rule, so that whoever is adding
 // the letter is always the one deciding where a page ends.

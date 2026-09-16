@@ -1,6 +1,6 @@
 // The hidden door for adding a letter.
 //
-// Ctrl+Alt+B puts a button on screen; the button opens a panel you drop his
+// Ctrl+Alt+B puts a button on screen; the button opens a panel you drop your
 // .txt onto. It previews the letter exactly as the game will lay it out, adds
 // it, and publishes it.
 //
@@ -113,7 +113,11 @@ if (TOKEN) {
     panel.appendChild(wrap);
 
     wrap.appendChild(el('h2', null, 'ADD A LETTER'));
-    const sub = el('p', 'sub', 'Drop his .txt file below, or paste what he wrote.');
+    const sub = el(
+      'p',
+      'sub',
+      'Drop any .txt file below, or paste what you wrote. No particular layout needed.',
+    );
     wrap.appendChild(sub);
 
     const drop = el('div', 'drop', 'Drop the file here, or click to pick one');
@@ -121,7 +125,7 @@ if (TOKEN) {
 
     const paste = el('textarea');
     paste.placeholder =
-      'Or paste his message here.\n\nFirst line is the date, like:  Saturday 19/09/2026\nThen a blank line, then his message, with a blank line between paragraphs.';
+      'Or just paste what you wrote.\n\nA blank line between paragraphs starts a new page.\nIf you want a date on the first sheet, put it on the very first line, like:  Saturday 19/09/2026';
     wrap.appendChild(paste);
 
     const row = el('div', 'row');
@@ -158,14 +162,14 @@ if (TOKEN) {
       }
       current = { text, number };
 
-      say(`Letter ${number}  -  ${out.date}`);
+      say(out.date ? `Letter ${number}  -  ${out.date}` : `Letter ${number}  -  no date on it`);
       say(`${out.sheets.length} page${out.sheets.length === 1 ? '' : 's'}`);
       out.notes.forEach((n) => say(n, 'note'));
       out.warnings.forEach((w) => say(w, 'warn'));
 
       out.sheets.forEach((sheet, i) => {
         const div = el('div', 'sheet' + (sheet.lines.length >= out.maxLines ? ' full' : ''));
-        if (i === 0) div.appendChild(el('div', 'stamp', out.date));
+        if (i === 0 && out.date) div.appendChild(el('div', 'stamp', out.date));
         div.appendChild(
           document.createTextNode(sheet.lines.map((l) => show(l, out.glyphFor)).join('\n')),
         );
@@ -210,7 +214,15 @@ if (TOKEN) {
       ev.preventDefault();
       readFile(ev.dataTransfer.files[0]);
     });
-    paste.addEventListener('change', () => paste.value.trim() && load(paste.value));
+    let typing = null;
+    const onType = () => {
+      clearTimeout(typing);
+      typing = setTimeout(() => {
+        if (paste.value.trim()) load(paste.value);
+      }, 500);
+    };
+    paste.addEventListener('input', onType);
+    paste.addEventListener('change', onType);
 
     // The whole panel accepts a drop, not just the dashed box - aiming is not
     // something anyone should have to do.

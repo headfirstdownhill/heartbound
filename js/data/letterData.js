@@ -6,8 +6,8 @@
 //
 // To change a letter, open its file in letters/ and run ADD-LETTER.bat again.
 //
-// His words are untouched bar the things the pixel font cannot draw: the curly
-// apostrophes his keyboard types are the straight ones here and render
+// Your words are untouched bar the things the pixel font cannot draw: the curly
+// apostrophes a phone keyboard types are the straight ones here and render
 // identically, and each emoji is the one-character stand-in that reserves a
 // blank for the real one to be drawn into. See js/data/emojiData.js.
 //

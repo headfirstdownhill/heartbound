@@ -1,7 +1,7 @@
 // Turns the plain-text letters in letters/ into js/data/letterData.js.
 //
 // This is the whole reason a letter no longer needs anyone to write code. What
-// goes in is his message, pasted as he sent it; what comes out is the game's
+// goes in is your message, pasted as you wrote it; what comes out is the game's
 // data file, regenerated from scratch every run. Nothing here edits hand-written
 // code, and re-running is always safe - if a generated file is ever damaged,
 // running this again replaces it wholesale.
@@ -46,34 +46,26 @@ function readLetter(file, registry, problems, warnings) {
   }
 
   const parsed = F.parseLetter(fs.readFileSync(file, 'utf8'));
+  // The only thing that can be wrong with a text file is that there is nothing
+  // in it. Anything with words in it is a letter.
   if (parsed.error === 'empty') {
-    problems.push(`${name} is empty. It needs a date on the first line and his message below it.`);
-    return null;
-  }
-  if (parsed.error === 'no-message') {
-    // Whether the first line is a date decides which mistake this is: a letter
-    // missing its message, or a file that is not a letter at all.
-    const looksLikeDate = !F.checkDate(parsed.date)?.includes('not in the expected shape');
-    problems.push(
-      looksLikeDate
-        ? `${name} has a date but no message under it.\n` +
-          '   Leave a blank line after the date, then paste what he wrote.'
-        : `${name} does not look like a letter. The first line should be the date,\n` +
-          '   like Saturday 19/09/2026, then a blank line, then his message.\n' +
-          `   Its first line is: "${parsed.date.slice(0, 60)}"`,
-    );
+    problems.push(`${name} has nothing in it.`);
     return null;
   }
 
   const warn = (msg) => warnings.push(`${name}: ${msg}`);
-  const dateProblem = F.checkDate(parsed.date);
-  if (dateProblem) warn(dateProblem);
+  // Only worth checking a date that is there. A letter with none is fine - the
+  // page simply does not stamp one.
+  if (parsed.date) {
+    const dateProblem = F.checkDate(parsed.date);
+    if (dateProblem) warn(dateProblem);
+  }
 
   const result = F.clean(parsed.body, registry);
 
   for (const [c, n] of Object.entries(result.literals)) {
     warn(
-      `removed ${n} "${c}" that he typed. That character is reserved for an emoji,` +
+      `removed ${n} "${c}" that you typed. That character is reserved for an emoji,` +
         `\n     so leaving it in would have shown the wrong picture.`,
     );
   }
@@ -139,7 +131,9 @@ function render(letters) {
       return [
         `  ${l.id}: {`,
         `    title: 'Letter ${l.n}',`,
-        `    date: '${l.date}',`,
+        // A letter with no date simply has none - the sheet only stamps one
+        // where there is one to stamp.
+        ...(l.date ? [`    date: '${l.date}',`] : []),
         `    cover: 0x${COVER.cover.toString(16)},`,
         `    coverDark: 0x${COVER.coverDark.toString(16)},`,
         '    bound: false,',
@@ -160,8 +154,8 @@ function render(letters) {
 //
 // To change a letter, open its file in letters/ and run ADD-LETTER.bat again.
 //
-// His words are untouched bar the things the pixel font cannot draw: the curly
-// apostrophes his keyboard types are the straight ones here and render
+// Your words are untouched bar the things the pixel font cannot draw: the curly
+// apostrophes a phone keyboard types are the straight ones here and render
 // identically, and each emoji is the one-character stand-in that reserves a
 // blank for the real one to be drawn into. See js/data/emojiData.js.
 //
@@ -263,7 +257,7 @@ function build({ write = true } = {}) {
     for (const l of letters) {
       asData[l.id] = {
         title: `Letter ${l.n}`,
-        date: l.date,
+        ...(l.date ? { date: l.date } : {}),
         cover: COVER.cover,
         coverDark: COVER.coverDark,
         bound: false,
@@ -321,7 +315,7 @@ function main() {
     console.error(
       '\nThere are no letters in the "letters" folder yet.\n\n' +
         'Make a copy of _TEMPLATE.txt, rename it letter3.txt, and put the date\n' +
-        'and his message in it. Then run this again.\n',
+        'and your message in it. Then run this again.\n',
     );
     process.exit(1);
   }
@@ -336,7 +330,7 @@ function main() {
   console.log('');
   for (const l of result.letters) {
     const sheets = l.pages.map((p) => `${F.linesFor(p, result.registry.standIns)}/${F.SHEET_LINES}`);
-    console.log(`  ${l.name}  ->  Letter ${l.n}, ${l.date}`);
+    console.log(`  ${l.name}  ->  Letter ${l.n}${l.date ? `, ${l.date}` : ' (no date on it)'}`);
     console.log(`     ${l.pages.length} pages:  ${sheets.join('  ')}`);
     l.notes.forEach((n) => console.log(`     ${n}`));
     console.log('');

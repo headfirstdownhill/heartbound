@@ -82,21 +82,10 @@ function nextLetterNumber() {
 // a trace. Nothing here touches disk.
 function preview(text, number) {
   const parsed = F.parseLetter(text);
+  // The only thing that can be wrong with a text file now is that there is
+  // nothing in it. Anything with words in it is a letter.
   if (parsed.error === 'empty') {
-    return { ok: false, error: 'That file is empty. It needs a date on the first line and his message under it.' };
-  }
-  if (parsed.error === 'no-message') {
-    // Whether the first line is a date decides which mistake this actually is:
-    // a letter missing its message, or a file that is not a letter at all.
-    // Saying "it has a date but no message" about a spreadsheet helps nobody.
-    const looksLikeDate = !F.checkDate(parsed.date)?.includes('not in the expected shape');
-    return {
-      ok: false,
-      error: looksLikeDate
-        ? 'That has a date but no message under it. Leave a blank line after the date, then paste what he wrote.'
-        : 'That does not look like a letter. The first line should be the date, like ' +
-          `Saturday 19/09/2026, then a blank line, then his message.\nIts first line is: "${parsed.date.slice(0, 60)}"`,
-    };
+    return { ok: false, error: 'There is nothing in that file - it has no words in it.' };
   }
 
   const registry = F.readRegistry();
@@ -108,8 +97,11 @@ function preview(text, number) {
   }
 
   const warnings = [];
-  const dateProblem = F.checkDate(parsed.date);
-  if (dateProblem) warnings.push(dateProblem.replace(/\n\s+/g, ' '));
+  // Only worth checking a date that is there. A letter with none is fine.
+  if (parsed.date) {
+    const dateProblem = F.checkDate(parsed.date);
+    if (dateProblem) warnings.push(dateProblem.replace(/\n\s+/g, ' '));
+  }
 
   // Dropping the same letter twice is an easy thing to do and there is nothing
   // in the shape of the file to stop it - it would just become the next number
@@ -126,7 +118,7 @@ function preview(text, number) {
     }
   }
   for (const [c, n] of Object.entries(result.literals)) {
-    warnings.push(`Removed ${n} "${c}" he typed - that character is reserved for an emoji.`);
+    warnings.push(`Removed ${n} "${c}" you typed - that character is reserved for an emoji.`);
   }
   if (result.unknownOther.length) {
     warnings.push(`Removed characters the writing cannot show: ${result.unknownOther.join(' ')}`);
