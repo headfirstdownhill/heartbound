@@ -182,10 +182,12 @@ const EMOJI_FONT =
 // The blank that widens a stand-in to two slots. See widenEmoji for why the
 // filler is not a space.
 const EMOJI_PAD = '_';
-// The stand-ins themselves, as a set rather than the character class this used
-// to be. Most of them are now Private Use characters picked by the tool, and a
-// regex built by hand out of those is an escaping bug waiting to happen.
-const EMOJI_KEYS = new Set(Object.keys(EMOJI));
+// The stand-ins themselves, read fresh each time rather than captured once.
+// Two reasons: they are mostly Private Use characters now, so the character
+// class this used to be would be an escaping bug waiting to happen; and the
+// table is replaced at start-up by the newest one off the server, which a set
+// built at load time would have missed.
+const emojiKeys = () => new Set(Object.keys(EMOJI));
 // Sized to the pair of slots it now owns. Two advances is 26px, and an emoji is
 // about 1.37 times as wide as its font size, so 18px lands at 25px and sits
 // inside its own space. The artwork inside an emoji does not fill its box, so
@@ -914,8 +916,9 @@ export class BookScene extends Phaser.Scene {
   // middle of itself. '_' has no glyph, so it sets an empty slot exactly like a
   // space would, but the wrapper reads the run as one unbreakable word.
   widenEmoji(text) {
+    const keys = emojiKeys();
     let out = '';
-    for (const c of text) out += EMOJI_KEYS.has(c) ? `${c}${EMOJI_PAD}` : c;
+    for (const c of text) out += keys.has(c) ? `${c}${EMOJI_PAD}` : c;
     return out;
   }
 

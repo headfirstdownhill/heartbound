@@ -36,6 +36,7 @@ $order = @(
   "js/ui/SpeechBubble.js",
   "js/data/emojiData.js",
   "js/data/letterData.js",
+  "js/data/liveData.js",
   "js/data/levelData.js",
   "js/data/joryData.js",
   "js/systems/RoomBuilder.js",

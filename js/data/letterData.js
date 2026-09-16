@@ -136,17 +136,4 @@ export const LETTER_BOOKS = {
       "I love you Jory, my beautiful jellyfish.",
     ],
   },
-  letter6: {
-    title: 'Letter 6',
-    date: 'Saturday 19/03/26',
-    cover: 0xf7b6cb,
-    coverDark: 0xe08fae,
-    bound: false,
-    icon: 'letter_closed',
-    pages: [
-      "asjdhaksjhd",
-
-      "asdasd asd asd as dasd",
-    ],
-  },
 };

@@ -14,6 +14,7 @@ import { Level1Scene, Level2Scene, Level3Scene, ReturnScene } from './scenes/lev
 import { WinScene, GameOverScene } from './scenes/endings.js';
 import { makePostFXClass, POSTFX_KEY } from './gfx/PostFX.js';
 import { audio } from './systems/AudioManager.js';
+import { refreshLiveData } from './data/liveData.js';
 
 // Built here rather than at module scope: a browser that fell back to the
 // canvas renderer has no pipeline class to extend, and this returns null there
@@ -60,7 +61,12 @@ const config = {
 
 if (PostFXClass) config.pipeline = { [POSTFX_KEY]: PostFXClass };
 
-window.game = new Phaser.Game(config);
+// The newest letters first, so a browser holding a ten-minute-old copy of them
+// still opens on what was published this morning. It never rejects and never
+// hangs, so the game starts either way - see js/data/liveData.js.
+refreshLiveData().finally(() => {
+  window.game = new Phaser.Game(config);
+});
 // Alongside `game`, for the same reason: the single-file build has no module
 // boundary to reach through, and auditioning a sound or a track from the
 // console is how the mix gets tuned. `audio.play('slam')`, `audio.music('boss')`.

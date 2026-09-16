@@ -7034,20 +7034,69 @@ const LETTER_BOOKS = {
       "I love you Jory, my beautiful jellyfish.",
     ],
   },
-  letter6: {
-    title: 'Letter 6',
-    date: 'Saturday 19/03/26',
-    cover: 0xf7b6cb,
-    coverDark: 0xe08fae,
-    bound: false,
-    icon: 'letter_closed',
-    pages: [
-      "asjdhaksjhd",
-
-      "asdasd asd asd as dasd",
-    ],
-  },
 };
+
+/* ---- js/data/liveData.js ---- */
+
+// Fetches the newest letters before the game starts, going round the cache.
+//
+// Why this has to exist: GitHub Pages serves everything with
+// `Cache-Control: max-age=600`. So for ten minutes after a letter is published,
+// a browser that has the site open keeps using the copy it already has, and the
+// new letter simply is not there. The file on the server is right; the browser
+// is not looking at it. That is confusing enough on its own - "I added it and it
+// is not there" - and worse when the person checking is the one who just
+// published it.
+//
+// So the letters are ALSO written as plain data in letters.json, and this pulls
+// that with `cache: 'no-store'` and a changing query, which no cache will answer
+// from. The result is copied over the built-in tables, in place, so everything
+// already holding a reference to them sees the new letters.
+//
+// Everything else - the game, the art, the two books - can stay cached. Only
+// what changes daily is fetched.
+//
+// If the fetch fails, nothing happens and the built-in letters are used. That is
+// the normal case for heartbound.html opened by double-clicking, where there is
+// no server to ask and `fetch` on a file:// path is refused. The game must not
+// care, so this never throws and never blocks.
+
+
+// Relative to the page rather than to this module, because the single-file build
+// strips module syntax and `import.meta` in a plain script is a syntax error
+// that would take the whole game down.
+const SOURCE = 'js/data/letters.json';
+
+// Contents swapped rather than the object replaced: BookScene built its BOOKS
+// table out of these at load time, so a new object here would be ignored.
+function replace(target, next) {
+  for (const key of Object.keys(target)) delete target[key];
+  Object.assign(target, next);
+}
+
+async function refreshLiveData() {
+  try {
+    // The game waits for this, so it cannot be allowed to wait forever. On a
+    // bad connection four seconds is the most this is worth; after that the
+    // built-in letters are better than a black screen.
+    const stop = new AbortController();
+    const timer = setTimeout(() => stop.abort(), 4000);
+    const res = await fetch(`${SOURCE}?v=${Date.now()}`, {
+      cache: 'no-store',
+      signal: stop.signal,
+    }).finally(() => clearTimeout(timer));
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!data || typeof data.letters !== 'object' || typeof data.emoji !== 'object') return false;
+    // Both or neither. A letter can carry an emoji the built-in table has never
+    // heard of, and half an update would draw it as a blank.
+    replace(EMOJI, data.emoji);
+    replace(LETTER_BOOKS, data.letters);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /* ---- js/data/levelData.js ---- */
 
@@ -11920,10 +11969,12 @@ const EMOJI_FONT =
 // The blank that widens a stand-in to two slots. See widenEmoji for why the
 // filler is not a space.
 const EMOJI_PAD = '_';
-// The stand-ins themselves, as a set rather than the character class this used
-// to be. Most of them are now Private Use characters picked by the tool, and a
-// regex built by hand out of those is an escaping bug waiting to happen.
-const EMOJI_KEYS = new Set(Object.keys(EMOJI));
+// The stand-ins themselves, read fresh each time rather than captured once.
+// Two reasons: they are mostly Private Use characters now, so the character
+// class this used to be would be an escaping bug waiting to happen; and the
+// table is replaced at start-up by the newest one off the server, which a set
+// built at load time would have missed.
+const emojiKeys = () => new Set(Object.keys(EMOJI));
 // Sized to the pair of slots it now owns. Two advances is 26px, and an emoji is
 // about 1.37 times as wide as its font size, so 18px lands at 25px and sits
 // inside its own space. The artwork inside an emoji does not fill its box, so
@@ -12652,8 +12703,9 @@ class BookScene extends Phaser.Scene {
   // middle of itself. '_' has no glyph, so it sets an empty slot exactly like a
   // space would, but the wrapper reads the run as one unbreakable word.
   widenEmoji(text) {
+    const keys = emojiKeys();
     let out = '';
-    for (const c of text) out += EMOJI_KEYS.has(c) ? `${c}${EMOJI_PAD}` : c;
+    for (const c of text) out += keys.has(c) ? `${c}${EMOJI_PAD}` : c;
     return out;
   }
 
@@ -13229,7 +13281,12 @@ const config = {
 
 if (PostFXClass) config.pipeline = { [POSTFX_KEY]: PostFXClass };
 
-window.game = new Phaser.Game(config);
+// The newest letters first, so a browser holding a ten-minute-old copy of them
+// still opens on what was published this morning. It never rejects and never
+// hangs, so the game starts either way - see js/data/liveData.js.
+refreshLiveData().finally(() => {
+  window.game = new Phaser.Game(config);
+});
 // Alongside `game`, for the same reason: the single-file build has no module
 // boundary to reach through, and auditioning a sound or a track from the
 // console is how the mix gets tuned. `audio.play('slam')`, `audio.music('boss')`.

@@ -25,6 +25,10 @@ const F = require('./letter-format.js');
 const ROOT = path.join(__dirname, '..');
 const LETTERS_DIR = path.join(ROOT, 'letters');
 const OUT = path.join(ROOT, 'js', 'data', 'letterData.js');
+// The same letters as plain data. The site fetches this past the cache at
+// start-up, so a letter published a minute ago is not hidden behind the
+// ten-minute cache GitHub Pages puts on everything. See js/data/liveData.js.
+const OUT_JSON = path.join(ROOT, 'js', 'data', 'letters.json');
 
 const COVER = { cover: 0xf7b6cb, coverDark: 0xe08fae };
 
@@ -252,6 +256,22 @@ function build({ write = true } = {}) {
     fs.mkdirSync(path.dirname(OUT), { recursive: true });
     fs.writeFileSync(OUT, render(letters), 'utf8');
     fs.writeFileSync(F.EMOJI_DATA, F.renderRegistry(registry), 'utf8');
+
+    const emoji = {};
+    for (const [glyph, standIn] of registry.toStandIn) emoji[standIn] = glyph;
+    const asData = {};
+    for (const l of letters) {
+      asData[l.id] = {
+        title: `Letter ${l.n}`,
+        date: l.date,
+        cover: COVER.cover,
+        coverDark: COVER.coverDark,
+        bound: false,
+        icon: 'letter_closed',
+        pages: l.pages,
+      };
+    }
+    fs.writeFileSync(OUT_JSON, JSON.stringify({ emoji, letters: asData }, null, 1), 'utf8');
   }
 
   return { letters, problems, warnings, registry, files };
