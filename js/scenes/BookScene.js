@@ -190,6 +190,8 @@ const EMOJI = {
   '+': '🪼',
   '=': '😋',
   ';': '💏',
+  '|': '🤔',
+  '{': '😴',
 };
 // Whatever the device has. Every platform ships exactly one of these, so the
 // first that resolves is the native set; the last is there only so a machine
@@ -199,7 +201,7 @@ const EMOJI_FONT =
 // The blank that widens a stand-in to two slots, and the stand-ins themselves.
 // See widenEmoji for why the filler is not a space.
 const EMOJI_PAD = '_';
-const EMOJI_KEYS = /[\^@#%$&*+=;]/g;
+const EMOJI_KEYS = /[\^@#%$&*+=;|{]/g;
 // Sized to the pair of slots it now owns. Two advances is 26px, and an emoji is
 // about 1.37 times as wide as its font size, so 18px lands at 25px and sits
 // inside its own space. The artwork inside an emoji does not fill its box, so
