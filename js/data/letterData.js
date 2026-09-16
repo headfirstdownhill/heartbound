@@ -136,4 +136,15 @@ export const LETTER_BOOKS = {
       "I love you Jory, my beautiful jellyfish.",
     ],
   },
+  letter6: {
+    title: 'Letter 6',
+    date: 'saturday 19/04/2026',
+    cover: 0xf7b6cb,
+    coverDark: 0xe08fae,
+    bound: false,
+    icon: 'letter_closed',
+    pages: [
+      "hello hi hello",
+    ],
+  },
 };
