@@ -1,0 +1,42 @@
+Here's how to add a letter yourself. There are two ways, and both end with the letter on the website.
+
+Way 1: with the .bat files
+
+1. Write the letter as a text file
+
+Open Notepad and paste your letter.
+The first line is the date, written like Friday 18/09/2026 (day name, then day/month/year).
+A blank line between paragraphs starts a new page.
+Emoji, curly apostrophes and … are all fine; the tool sorts them out.
+
+2. Save it in the letters folder with the next number
+
+HeartBoundV2\letters\letter7.txt. The next one is 7, then 8, and so on.
+The name must be exactly letter plus the number, with no spaces.
+
+3. Double-click ADD-LETTER.bat
+
+It lists every letter and ends with "ALL DONE."
+If it says something needs fixing, read the message, fix the file and run it again.
+
+4. Check it (optional)
+
+Double-click heartbound.html and read the letter through in the game.
+
+5. Double-click PUBLISH.bat
+
+It lists the files about to go online, which should be your letter plus a few game files.
+Type yes and press Enter.
+When it says "PUBLISHED.", wait about a minute, then open the website and pull down to refresh.
+Way 2: with the drop page
+Double-click DROP-LETTER.bat. The game opens in your browser; leave the black window open.
+Press Ctrl + Alt + B, then click the ADD A LETTER button.
+Drop your .txt file in, or paste the letter, with the date on the first line as above.
+Check the preview, then press ADD TO THE GAME. Press it only once.
+Press PUBLISH.
+Close the black window when you're done.
+If something goes wrong
+"could not be sent to the website": the letter is saved on your computer but didn't reach GitHub, usually because of the internet. Don't run PUBLISH.bat again: in your version it will say "nothing has changed" and still not send it. Instead, open a terminal in the HeartBoundV2 folder, once the internet is back, and run:
+git push
+"the letters are not in step": run ADD-LETTER.bat again, then PUBLISH.bat.
+The website still shows the old letters: your phone or browser is showing an old copy. Pull down to refresh, or wait a few minutes.
