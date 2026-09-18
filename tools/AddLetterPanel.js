@@ -218,7 +218,11 @@ if (TOKEN) {
     const onType = () => {
       clearTimeout(typing);
       typing = setTimeout(() => {
-        if (paste.value.trim()) load(paste.value);
+        // Only for words that have actually changed. Clicking ADD takes focus
+        // off the box, which fires 'change' - and re-previewing the same text
+        // then wiped the "Added" message and offered it again as the next
+        // number, warning that it matched the letter just added.
+        if (paste.value.trim() && paste.value !== current?.text) load(paste.value);
       }, 500);
     };
     paste.addEventListener('input', onType);

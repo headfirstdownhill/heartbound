@@ -136,4 +136,31 @@ export const LETTER_BOOKS = {
       "I love you Jory, my beautiful jellyfish.",
     ],
   },
+  letter6: {
+    title: 'Letter 6',
+    date: 'Thursday 17/09/2026',
+    cover: 0xf7b6cb,
+    coverDark: 0xe08fae,
+    bound: false,
+    icon: 'letter_closed',
+    pages: [
+      "GOOD MORNING BABY, today is finally the last day for school, not counting friday cos friday is just friday ",
+
+      "YOU ARE GONNA BE ALL MINE **==",
+
+      "I love you so much baby, I love how caring you are for me. I love how motherly you are to me. I love you and I love how you make me feel from everything you say and do for me, baby I love you so much.",
+
+      "Please come back SUPER SOON today I'll miss you so much sweetheart ",
+
+      "There's not much to say today except I LOVE YOU and I really really need you, I love you Jory, I love YOU my beautiful baby, so much",
+
+      "Do well in school study, and study really well, focus hard and maybe if you can, sleep in class ##",
+
+      "And I guess today... you can be a little mischievous ",
+
+      "I love you baby, take GOOD care of yourself and drink a lot of water in school, make sure you eat something small at least as well, and when you're coming back home make sure you have some water to drink, don't let yourself get too tired my princess",
+
+      "I love you so much baby, I LOVE YOU ^^^^^^",
+    ],
+  },
 };
