@@ -24,18 +24,7 @@ rem letter is one of those, and a check for changed-tracked-files only would
 rem call that "nothing to publish".
 set "DIRTY="
 for /f "delims=" %%s in ('git status --porcelain -uall') do set "DIRTY=1"
-if defined DIRTY goto review
-
-rem Nothing new, but a publish whose push failed last time leaves its commit
-rem here and a clean folder behind. That still has to go out.
-set "AHEAD=0"
-for /f "delims=" %%n in ('node tools\add-letter.js --unpushed') do set "AHEAD=%%n"
-if "%AHEAD%"=="0" goto nothing
-echo   Last time, the letters were saved on this computer but never reached
-echo   the website. Sending them now.
-goto push
-
-:review
+if not defined DIRTY goto nothing
 
 echo   These are the things that have changed and are about to go online:
 echo.
@@ -63,7 +52,6 @@ if errorlevel 1 goto failed
 git commit -m "%MSG%"
 if errorlevel 1 goto failed
 
-:push
 echo.
 echo   Sending it to the website...
 git push
