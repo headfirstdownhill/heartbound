@@ -98,7 +98,9 @@ export class HUDScene extends Phaser.Scene {
       this.pendingHint = null;
     }
 
-    this.events.on('shutdown', () => {
+    // once: the scene instance is reused, so `on` would stack one more of
+    // these up on every run.
+    this.events.once('shutdown', () => {
       this.game.events.off(EV_HEALTH_CHANGED, this.refreshHearts, this);
       if (this.onWave) this.game.events.off(EV_WAVE_CHANGED, this.onWave);
       input.detachTouchUI();
@@ -148,6 +150,7 @@ export class HUDScene extends Phaser.Scene {
     if (this.paused || !level) return;
     this.paused = true;
     this.pausedLevel = level;
+    this.pausedAtLoop = this.game.loop.time;
 
     runTimer.pause();
     level.scene.pause();
@@ -195,6 +198,9 @@ export class HUDScene extends Phaser.Scene {
 
     runTimer.resume();
     audio.releaseMusic();
+    // Deadlines a level keeps on the game clock - the shield, a power-up's
+    // lifetime - kept running under the pause menu. Hand the time back.
+    this.pausedLevel?.onResumed?.(this.game.loop.time - this.pausedAtLoop);
     this.pausedLevel?.scene.resume();
     this.pausedLevel = null;
   }

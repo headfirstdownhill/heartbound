@@ -107,7 +107,8 @@ export class BaseLevelScene extends Phaser.Scene {
     this.onTimeUp = () => this.loseToTimer();
     this.game.events.on(EV_TIMER_EXPIRED, this.onTimeUp);
 
-    this.events.on('shutdown', () => {
+    // once, not on: this instance is reused, and each run would add another.
+    this.events.once('shutdown', () => {
       this.game.events.off(EV_BLOB_DIED, this.onBlobDied);
       this.game.events.off(EV_TIMER_EXPIRED, this.onTimeUp);
     });

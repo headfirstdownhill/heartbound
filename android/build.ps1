@@ -69,7 +69,10 @@ New-Item -ItemType Directory -Force -Path $build, "$build\classes", "$build\gen"
 # phone in flight mode, so the vendored copy in assets is swapped in here rather
 # than the two HTML files being kept in step by hand.
 Step 'staging game assets'
-$html = Get-Content $Game -Raw
+# -Encoding UTF8 for the same reason as in build.ps1: without it Windows
+# PowerShell reads the bundle as ANSI and every emoji in the books comes out as
+# mojibake inside the apk.
+$html = Get-Content $Game -Raw -Encoding UTF8
 $before = $html
 $html = [regex]::Replace($html, '<script src="https://cdn\.jsdelivr\.net/npm/phaser@[^"]+"></script>',
   '<script src="phaser.min.js"></script>')

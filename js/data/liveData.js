@@ -29,8 +29,9 @@ import { EMOJI } from './emojiData.js';
 // that would take the whole game down.
 const SOURCE = 'js/data/letters.json';
 
-// Contents swapped rather than the object replaced: BookScene built its BOOKS
-// table out of these at load time, so a new object here would be ignored.
+// Contents swapped rather than the object replaced: BookScene holds these very
+// objects and reads from them each time a letter is opened, so a new object
+// here would be ignored.
 function replace(target, next) {
   for (const key of Object.keys(target)) delete target[key];
   Object.assign(target, next);

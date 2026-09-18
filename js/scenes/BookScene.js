@@ -215,12 +215,16 @@ const BOOKS = {
     coverDark: 0x5f3690,
     icon: 'book2',
   },
-  // And every letter, from the generated file. Not books, and each one knows
-  // it: `bound: false` drops the spine and the gutter, because a sheet out of
-  // an envelope has no binding to sit in, and a letter with a spine down its
-  // left edge is a book pretending otherwise.
-  ...LETTER_BOOKS,
 };
+
+// The books, then every letter. Looked up at the moment of opening rather than
+// copied into BOOKS above: the letters table is replaced at start-up by the
+// newest one off the server, and a copy taken at load time would list a new
+// letter and then open a different one when it was pressed.
+//
+// Letters are not books, and each one knows it: `bound: false` drops the spine
+// and the gutter, because a sheet out of an envelope has no binding to sit in.
+const findBook = (id) => LETTER_BOOKS[id] ?? BOOKS[id];
 
 // What sits on the shelf. Four things, and it stays four things however many
 // letters there are, which is the whole point of the LETTERS panel.
@@ -379,7 +383,7 @@ export class BookScene extends Phaser.Scene {
   // Every step checks the sprite is still on a scene: these are timed callbacks,
   // and if she leaves mid-open they would otherwise land on destroyed objects.
   openLetter(id, fromList = false) {
-    this.bookId = BOOKS[id] ? id : 'letter1';
+    this.bookId = LETTER_BOOKS[id] ? id : Object.keys(LETTER_BOOKS)[0];
     // Remembered so CLOSE, and a leftward turn off page one, go back where she
     // came from rather than always to the shelf.
     this.fromLetters = fromList;
@@ -446,7 +450,7 @@ export class BookScene extends Phaser.Scene {
   // the way in to a cover rather than up front, so the book she never opens is
   // never wrapped.
   openBook(id) {
-    this.bookId = BOOKS[id] ? id : DEFAULT_BOOK;
+    this.bookId = findBook(id) ? id : DEFAULT_BOOK;
     this.fromLetters = false;
     this.pages = this.buildPages();
     this.page = 0;
@@ -503,7 +507,7 @@ export class BookScene extends Phaser.Scene {
   }
 
   get book() {
-    return BOOKS[this.bookId] ?? BOOKS[DEFAULT_BOOK];
+    return findBook(this.bookId) ?? BOOKS[DEFAULT_BOOK];
   }
 
   buildPages() {
@@ -601,7 +605,7 @@ export class BookScene extends Phaser.Scene {
       const col = i - r * SHELF_COLS;
       const x = cx + (col - (inRow - 1) / 2) * (REWARD_W + SHELF_GAP);
       const y = SHELF_TOP + r * SHELF_ROW_H;
-      const entry = it.book ? BOOKS[it.book] : null;
+      const entry = it.book ? findBook(it.book) : null;
       // The letters panel wears the same envelope the letters do, because it is
       // the pile of them rather than a thing of its own.
       const icon = entry ? entry.icon : it.letters ? 'letter_closed' : it.icon;

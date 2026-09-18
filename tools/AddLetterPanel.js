@@ -52,7 +52,7 @@ if (TOKEN) {
     #addletter button.ghost { background: none; border: 2px solid #4a4363; color: #b9b2cd;
       box-shadow: none; padding: 10px 14px; font: inherit; cursor: pointer; }
     #addletter .note { color: #9fe0a0; margin: 3px 0; }
-    #addletter .warn { color: #ffcf6a; margin: 3px 0; }
+    #addletter .warn { color: #ffcf6a; margin: 3px 0; white-space: pre-wrap; }
     #addletter .bad { color: #ff8091; margin: 3px 0; white-space: pre-wrap; }
     #addletter .sheets { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
     #addletter .sheet { background: #f6f2e8; color: #241f2e; width: 250px; min-height: 300px;
@@ -218,7 +218,11 @@ if (TOKEN) {
     const onType = () => {
       clearTimeout(typing);
       typing = setTimeout(() => {
-        if (paste.value.trim()) load(paste.value);
+        // Only for words that have actually changed. Clicking ADD takes focus
+        // off the box, which fires 'change' - and re-previewing the same text
+        // then wiped the "Added" message and offered it again as the next
+        // number, one press away from the same letter on the shelf twice.
+        if (paste.value.trim() && paste.value !== current?.text) load(paste.value);
       }, 500);
     };
     paste.addEventListener('input', onType);
@@ -250,10 +254,40 @@ if (TOKEN) {
       pubBtn.disabled = false;
     });
 
+    // Two presses. The first shows everything that is about to go up - the
+    // site is public, and a publish takes every changed file in the folder,
+    // not just the letter - and the second sends exactly that list.
+    let seen = null;
     pubBtn.addEventListener('click', async () => {
       pubBtn.disabled = true;
+      if (seen === null) {
+        const list = await call('pending');
+        if (!list.ok) {
+          say(list.error, 'bad');
+          pubBtn.disabled = false;
+          return;
+        }
+        if (!list.status && !list.unpushed) {
+          say('Nothing has changed since the last time, so there is nothing to publish.', 'bad');
+          pubBtn.disabled = false;
+          return;
+        }
+        say(
+          list.status
+            ? `These are about to go online, where anyone can read them:\n${list.status}`
+            : 'Last time it was saved here but never reached the website. It will be sent now.',
+          'warn',
+        );
+        seen = list.status;
+        pubBtn.textContent = 'YES, PUBLISH THESE';
+        pubBtn.disabled = false;
+        return;
+      }
+
       const line = say('Publishing, then waiting for the website to catch up...');
-      const out = await call('publish', current);
+      const out = await call('publish', { ...current, seen });
+      seen = null;
+      pubBtn.textContent = 'PUBLISH';
       if (!out.ok) {
         line.textContent = '';
         say(out.error, 'bad');

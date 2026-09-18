@@ -93,6 +93,20 @@ public class MainActivity extends Activity {
         }
     }
 
+    // Tells the page it is out of sight, which is what makes the game fall
+    // silent when the phone is locked or the app is switched away from.
+    @Override
+    protected void onPause() {
+        if (web != null) web.onPause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (web != null) web.onResume();
+    }
+
     @Override
     protected void onDestroy() {
         if (web != null) {

@@ -378,6 +378,8 @@ export class AudioEngine {
   // resume() rejects if it is called without a gesture behind it, which is not
   // a failure worth reporting — the next tap calls this again.
   resumeIfNeeded() {
+    // Put to sleep on purpose while the page is out of sight - see sleep().
+    if (this.asleep) return;
     if (!this.ctx || this.ctx.state === 'running') return;
     // Retrying every scheduler tick would be a resume call every 25ms for as
     // long as the interruption lasts.
@@ -385,6 +387,31 @@ export class AudioEngine {
     if (now - (this.lastResumeTry ?? 0) < 500) return;
     this.lastResumeTry = now;
     this.ctx.resume?.().catch(() => {});
+  }
+
+  // The page going out of sight - another tab, the phone locked, the app sent
+  // to the background. Phaser stops its loop then, but nothing stopped the
+  // sound: a recording is an <audio> element and simply carried on playing
+  // from a pocket. Only a recording that was actually sounding is remembered,
+  // so coming back never starts one that had been stopped.
+  sleep() {
+    if (this.asleep) return;
+    this.asleep = true;
+    this.sleptEl = this.el && !this.el.paused ? this.el : null;
+    this.sleptEl?.pause();
+    if (this.ctx && this.ctx.state === 'running') this.ctx.suspend?.().catch(() => {});
+  }
+
+  wake() {
+    if (!this.asleep) return;
+    this.asleep = false;
+    // Only if it is still the current track; one swapped in meanwhile owns
+    // what plays now.
+    if (this.sleptEl && this.sleptEl === this.el) this.sleptEl.play()?.catch(() => {});
+    this.sleptEl = null;
+    // Straight to resume rather than through resumeIfNeeded, whose retry
+    // throttle could swallow this one call that is not a gesture.
+    if (this.ctx && this.ctx.state !== 'running') this.ctx.resume?.().catch(() => {});
   }
 
   unlock() {
@@ -1436,10 +1463,11 @@ if (typeof window !== 'undefined') {
   ['pointerdown', 'keydown'].forEach((ev) =>
     window.addEventListener(ev, unlockAudio, { passive: true }),
   );
-  // Coming back to the tab, or unlocking the phone, is the moment an
-  // interrupted context can be revived — and it is not a gesture, so nothing
-  // above fires for it.
+  // Hidden is silent. Coming back to the tab, or unlocking the phone, is also
+  // the moment an interrupted context can be revived — and it is not a
+  // gesture, so nothing above fires for it.
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) audio.resumeIfNeeded();
+    if (document.hidden) audio.sleep();
+    else audio.wake();
   });
 }

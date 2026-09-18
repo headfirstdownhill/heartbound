@@ -189,6 +189,21 @@ function commitMessage() {
   return 'The letters';
 }
 
+// How many commits are here and not yet on GitHub. 0 when that cannot be told -
+// no upstream, no git - so a failure here never invents work to do.
+function unpushedCount() {
+  try {
+    const out = execFileSync('git', ['rev-list', '--count', '@{u}..HEAD'], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    return parseInt(out.trim(), 10) || 0;
+  } catch {
+    return 0;
+  }
+}
+
 // ---- putting it together ---------------------------------------------------
 
 // Shared with the drop page, which needs the same work done without any of the
@@ -294,8 +309,24 @@ function build({ write = true } = {}) {
 function main() {
   // Used by PUBLISH.bat before it commits anything. Regenerating is the check:
   // if the two files disagree, build() throws and nothing goes out.
+  // A problem is not a throw - build() hands them back and writes nothing - so
+  // they have to be checked here too, or a misnamed file in letters/ would pass
+  // and then be published on its own while the game stayed as it was.
   if (process.argv.includes('--verify')) {
-    build();
+    const { problems } = build();
+    if (problems.length) {
+      console.error('\nSomething in the letters folder needs fixing first:\n');
+      problems.forEach((p) => console.error(` - ${p}\n`));
+      process.exit(1);
+    }
+    return;
+  }
+
+  // Commits made on this computer that the website has not received yet -
+  // what a publish leaves behind when the push fails. PUBLISH.bat asks, so a
+  // second run sends them rather than calling a clean folder "nothing to do".
+  if (process.argv.includes('--unpushed')) {
+    console.log(unpushedCount());
     return;
   }
 
@@ -345,7 +376,7 @@ function main() {
   console.log(`  Saved. The game now has ${total} letter${total === 1 ? '' : 's'} in it.\n`);
 }
 
-module.exports = { build, commitMessage, render, LETTERS_DIR, OUT };
+module.exports = { build, commitMessage, unpushedCount, render, LETTERS_DIR, OUT };
 
 if (require.main === module) {
   try {

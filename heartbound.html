@@ -460,6 +460,8 @@ class AudioEngine {
   // resume() rejects if it is called without a gesture behind it, which is not
   // a failure worth reporting — the next tap calls this again.
   resumeIfNeeded() {
+    // Put to sleep on purpose while the page is out of sight - see sleep().
+    if (this.asleep) return;
     if (!this.ctx || this.ctx.state === 'running') return;
     // Retrying every scheduler tick would be a resume call every 25ms for as
     // long as the interruption lasts.
@@ -467,6 +469,31 @@ class AudioEngine {
     if (now - (this.lastResumeTry ?? 0) < 500) return;
     this.lastResumeTry = now;
     this.ctx.resume?.().catch(() => {});
+  }
+
+  // The page going out of sight - another tab, the phone locked, the app sent
+  // to the background. Phaser stops its loop then, but nothing stopped the
+  // sound: a recording is an <audio> element and simply carried on playing
+  // from a pocket. Only a recording that was actually sounding is remembered,
+  // so coming back never starts one that had been stopped.
+  sleep() {
+    if (this.asleep) return;
+    this.asleep = true;
+    this.sleptEl = this.el && !this.el.paused ? this.el : null;
+    this.sleptEl?.pause();
+    if (this.ctx && this.ctx.state === 'running') this.ctx.suspend?.().catch(() => {});
+  }
+
+  wake() {
+    if (!this.asleep) return;
+    this.asleep = false;
+    // Only if it is still the current track; one swapped in meanwhile owns
+    // what plays now.
+    if (this.sleptEl && this.sleptEl === this.el) this.sleptEl.play()?.catch(() => {});
+    this.sleptEl = null;
+    // Straight to resume rather than through resumeIfNeeded, whose retry
+    // throttle could swallow this one call that is not a gesture.
+    if (this.ctx && this.ctx.state !== 'running') this.ctx.resume?.().catch(() => {});
   }
 
   unlock() {
@@ -1518,11 +1545,12 @@ if (typeof window !== 'undefined') {
   ['pointerdown', 'keydown'].forEach((ev) =>
     window.addEventListener(ev, unlockAudio, { passive: true }),
   );
-  // Coming back to the tab, or unlocking the phone, is the moment an
-  // interrupted context can be revived — and it is not a gesture, so nothing
-  // above fires for it.
+  // Hidden is silent. Coming back to the tab, or unlocking the phone, is also
+  // the moment an interrupted context can be revived — and it is not a
+  // gesture, so nothing above fires for it.
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) audio.resumeIfNeeded();
+    if (document.hidden) audio.sleep();
+    else audio.wake();
   });
 }
 
@@ -7067,8 +7095,9 @@ const LETTER_BOOKS = {
 // that would take the whole game down.
 const SOURCE = 'js/data/letters.json';
 
-// Contents swapped rather than the object replaced: BookScene built its BOOKS
-// table out of these at load time, so a new object here would be ignored.
+// Contents swapped rather than the object replaced: BookScene holds these very
+// objects and reads from them each time a letter is opened, so a new object
+// here would be ignored.
 function replace(target, next) {
   for (const key of Object.keys(target)) delete target[key];
   Object.assign(target, next);
@@ -10427,7 +10456,9 @@ class HUDScene extends Phaser.Scene {
       this.pendingHint = null;
     }
 
-    this.events.on('shutdown', () => {
+    // once: the scene instance is reused, so `on` would stack one more of
+    // these up on every run.
+    this.events.once('shutdown', () => {
       this.game.events.off(EV_HEALTH_CHANGED, this.refreshHearts, this);
       if (this.onWave) this.game.events.off(EV_WAVE_CHANGED, this.onWave);
       input.detachTouchUI();
@@ -10477,6 +10508,7 @@ class HUDScene extends Phaser.Scene {
     if (this.paused || !level) return;
     this.paused = true;
     this.pausedLevel = level;
+    this.pausedAtLoop = this.game.loop.time;
 
     runTimer.pause();
     level.scene.pause();
@@ -10524,6 +10556,9 @@ class HUDScene extends Phaser.Scene {
 
     runTimer.resume();
     audio.releaseMusic();
+    // Deadlines a level keeps on the game clock - the shield, a power-up's
+    // lifetime - kept running under the pause menu. Hand the time back.
+    this.pausedLevel?.onResumed?.(this.game.loop.time - this.pausedAtLoop);
     this.pausedLevel?.scene.resume();
     this.pausedLevel = null;
   }
@@ -10702,7 +10737,8 @@ class BaseLevelScene extends Phaser.Scene {
     this.onTimeUp = () => this.loseToTimer();
     this.game.events.on(EV_TIMER_EXPIRED, this.onTimeUp);
 
-    this.events.on('shutdown', () => {
+    // once, not on: this instance is reused, and each run would add another.
+    this.events.once('shutdown', () => {
       this.game.events.off(EV_BLOB_DIED, this.onBlobDied);
       this.game.events.off(EV_TIMER_EXPIRED, this.onTimeUp);
     });
@@ -11667,6 +11703,13 @@ class JoryLevelScene extends BaseLevelScene {
     });
   }
 
+  // Called by the HUD with how long the pause menu was up. Both of these are
+  // absolute times on the game clock, which does not stop for a pause.
+  onResumed(ms) {
+    if (this.player.shieldUntil > 0) this.player.shieldUntil += ms;
+    if (this.powerUp) this.powerUp.expiresAt += ms;
+  }
+
   // ---- per-frame ---------------------------------------------------------
 
   onUpdate(time) {
@@ -12002,12 +12045,16 @@ const BOOKS = {
     coverDark: 0x5f3690,
     icon: 'book2',
   },
-  // And every letter, from the generated file. Not books, and each one knows
-  // it: `bound: false` drops the spine and the gutter, because a sheet out of
-  // an envelope has no binding to sit in, and a letter with a spine down its
-  // left edge is a book pretending otherwise.
-  ...LETTER_BOOKS,
 };
+
+// The books, then every letter. Looked up at the moment of opening rather than
+// copied into BOOKS above: the letters table is replaced at start-up by the
+// newest one off the server, and a copy taken at load time would list a new
+// letter and then open a different one when it was pressed.
+//
+// Letters are not books, and each one knows it: `bound: false` drops the spine
+// and the gutter, because a sheet out of an envelope has no binding to sit in.
+const findBook = (id) => LETTER_BOOKS[id] ?? BOOKS[id];
 
 // What sits on the shelf. Four things, and it stays four things however many
 // letters there are, which is the whole point of the LETTERS panel.
@@ -12166,7 +12213,7 @@ class BookScene extends Phaser.Scene {
   // Every step checks the sprite is still on a scene: these are timed callbacks,
   // and if she leaves mid-open they would otherwise land on destroyed objects.
   openLetter(id, fromList = false) {
-    this.bookId = BOOKS[id] ? id : 'letter1';
+    this.bookId = LETTER_BOOKS[id] ? id : Object.keys(LETTER_BOOKS)[0];
     // Remembered so CLOSE, and a leftward turn off page one, go back where she
     // came from rather than always to the shelf.
     this.fromLetters = fromList;
@@ -12233,7 +12280,7 @@ class BookScene extends Phaser.Scene {
   // the way in to a cover rather than up front, so the book she never opens is
   // never wrapped.
   openBook(id) {
-    this.bookId = BOOKS[id] ? id : DEFAULT_BOOK;
+    this.bookId = findBook(id) ? id : DEFAULT_BOOK;
     this.fromLetters = false;
     this.pages = this.buildPages();
     this.page = 0;
@@ -12290,7 +12337,7 @@ class BookScene extends Phaser.Scene {
   }
 
   get book() {
-    return BOOKS[this.bookId] ?? BOOKS[DEFAULT_BOOK];
+    return findBook(this.bookId) ?? BOOKS[DEFAULT_BOOK];
   }
 
   buildPages() {
@@ -12388,7 +12435,7 @@ class BookScene extends Phaser.Scene {
       const col = i - r * SHELF_COLS;
       const x = cx + (col - (inRow - 1) / 2) * (REWARD_W + SHELF_GAP);
       const y = SHELF_TOP + r * SHELF_ROW_H;
-      const entry = it.book ? BOOKS[it.book] : null;
+      const entry = it.book ? findBook(it.book) : null;
       // The letters panel wears the same envelope the letters do, because it is
       // the pile of them rather than a thing of its own.
       const icon = entry ? entry.icon : it.letters ? 'letter_closed' : it.icon;

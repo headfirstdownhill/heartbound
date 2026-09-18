@@ -21,11 +21,16 @@ const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 
 const F = require('./letter-format.js');
-const { build, commitMessage } = require('./add-letter.js');
+const { build, commitMessage, unpushedCount } = require('./add-letter.js');
 
 const ROOT = path.join(__dirname, '..');
 const LETTERS_DIR = path.join(ROOT, 'letters');
 const PORT = 4173;
+// The only names this server answers to. Binding to 127.0.0.1 keeps other
+// machines out, but not a website whose domain has been pointed at 127.0.0.1
+// after it loaded (DNS rebinding): that page would be served index.html, token
+// and all. It cannot make its own requests say localhost, though.
+const HOSTS = new Set([`localhost:${PORT}`, `127.0.0.1:${PORT}`]);
 const LIVE_URL = 'https://headfirstdownhill.github.io/heartbound/';
 
 // Handed to the page it serves and required on every action.
@@ -56,8 +61,11 @@ function readBody(req) {
     req.on('data', (c) => {
       data += c;
       // A letter is a few kilobytes. Anything of this size is a mistake or a
-      // file that is not text at all.
-      if (data.length > 2_000_000) reject(new Error('That file is far too big to be a letter.'));
+      // file that is not text at all - and there is no reason to keep reading it.
+      if (data.length > 2_000_000) {
+        reject(new Error('That file is far too big to be a letter.'));
+        req.destroy();
+      }
     });
     req.on('end', () => resolve(data));
     req.on('error', reject);
@@ -173,10 +181,23 @@ function preview(text, number) {
 // ---- actions ---------------------------------------------------------------
 
 function addLetter(text, number) {
+  // The number arrives from the page and ends up in a file name, and a letter
+  // that is already there must never be written over - if the build then
+  // failed, the clean-up below would delete the original.
+  if (!Number.isInteger(number) || number < 1) {
+    return { ok: false, error: 'That letter number is not a whole number.' };
+  }
+  const file = path.join(LETTERS_DIR, `letter${number}.txt`);
+  if (fs.existsSync(file)) {
+    return {
+      ok: false,
+      error: `There is already a letter ${number}. Drop the file in again and it will be given the next number.`,
+    };
+  }
+
   const check = preview(text, number);
   if (!check.ok) return check;
 
-  const file = path.join(LETTERS_DIR, `letter${number}.txt`);
   const body = String(text).replace(/\r\n?/g, '\n').trim() + '\n';
   fs.writeFileSync(file, body, 'utf8');
 
@@ -230,18 +251,37 @@ function checkInStep() {
   );
 }
 
-function publish() {
+// What a publish would send, so the page can show it before anything goes.
+// The site is public, and `git add -A` takes everything in the folder.
+function pending() {
+  const status = git(['status', '--porcelain', '-uall']).replace(/s+$/, '');
+  return { status, unpushed: unpushedCount() };
+}
+
+// `seen` is the list the page showed and she agreed to. If the folder has
+// changed since, that agreement was not about what is there now.
+function publish(seen) {
   const mismatch = checkInStep();
   if (mismatch) return { ok: false, error: mismatch };
 
-  const status = git(['status', '--porcelain', '-uall']).trim();
-  if (!status) return { ok: false, error: 'Nothing has changed since the last time, so there is nothing to publish.' };
+  const { status, unpushed } = pending();
+  if (seen !== status) {
+    return { ok: false, error: 'The files changed after the list was shown. Press PUBLISH again to see the new list.' };
+  }
 
-  const message = commitMessage();
-  git(['add', '-A']);
-  git(['commit', '-m', message]);
-  git(['push', 'origin', 'HEAD']);
-  return { ok: true, message, url: LIVE_URL };
+  if (status) {
+    const message = commitMessage();
+    git(['add', '-A']);
+    git(['commit', '-m', message]);
+    git(['push', 'origin', 'HEAD']);
+    return { ok: true, message, url: LIVE_URL };
+  }
+  // Nothing new, but a publish whose push failed is still sitting here.
+  if (unpushed > 0) {
+    git(['push', 'origin', 'HEAD']);
+    return { ok: true, message: git(['log', '-1', '--format=%s']).trim(), url: LIVE_URL };
+  }
+  return { ok: false, error: 'Nothing has changed since the last time, so there is nothing to publish.' };
 }
 
 // Confirms the change is genuinely on the website rather than claiming it after
@@ -266,6 +306,7 @@ async function waitForLive(expect) {
 // ---- the server ------------------------------------------------------------
 
 const server = http.createServer(async (req, res) => {
+  if (!HOSTS.has(req.headers.host)) return send(res, 403, 'no', 'text/plain');
   const url = new URL(req.url, `http://localhost:${PORT}`);
 
   if (url.pathname.startsWith('/__drop/')) {
@@ -276,6 +317,9 @@ const server = http.createServer(async (req, res) => {
     try {
       if (url.pathname === '/__drop/status') {
         return json(res, 200, { next: nextLetterNumber(), live: LIVE_URL });
+      }
+      if (url.pathname === '/__drop/pending') {
+        return json(res, 200, { ok: true, ...pending() });
       }
       if (req.method !== 'POST') return json(res, 405, { error: 'wrong method' });
 
@@ -288,7 +332,7 @@ const server = http.createServer(async (req, res) => {
         return json(res, 200, addLetter(body.text, body.number ?? nextLetterNumber()));
       }
       if (url.pathname === '/__drop/publish') {
-        const out = publish();
+        const out = publish(body.seen);
         if (!out.ok) return json(res, 200, out);
         const live = await waitForLive(body.number ?? nextLetterNumber() - 1);
         return json(res, 200, { ...out, live });
@@ -300,10 +344,26 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Everything else is the game itself, straight off disk.
-  let rel = decodeURIComponent(url.pathname);
+  let rel;
+  try {
+    rel = decodeURIComponent(url.pathname);
+  } catch {
+    // A stray '%' would otherwise throw here and take the whole server down.
+    return send(res, 400, 'bad address', 'text/plain');
+  }
   if (rel === '/') rel = '/index.html';
   const file = path.join(ROOT, rel);
-  if (!file.startsWith(ROOT)) return send(res, 403, 'no');
+  // With the separator, so a neighbouring folder whose name merely starts the
+  // same way is not inside. Dot-folders (.git) and the signing key are never
+  // part of the game.
+  const inside = path.relative(ROOT, file);
+  if (
+    !file.startsWith(ROOT + path.sep) ||
+    inside.split(path.sep).some((part) => part.startsWith('.')) ||
+    /.keystore$/i.test(file)
+  ) {
+    return send(res, 403, 'no', 'text/plain');
+  }
 
   fs.readFile(file, (err, data) => {
     if (err) return send(res, 404, 'not found', 'text/plain');

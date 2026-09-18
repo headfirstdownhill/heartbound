@@ -428,6 +428,13 @@ export class JoryLevelScene extends BaseLevelScene {
     });
   }
 
+  // Called by the HUD with how long the pause menu was up. Both of these are
+  // absolute times on the game clock, which does not stop for a pause.
+  onResumed(ms) {
+    if (this.player.shieldUntil > 0) this.player.shieldUntil += ms;
+    if (this.powerUp) this.powerUp.expiresAt += ms;
+  }
+
   // ---- per-frame ---------------------------------------------------------
 
   onUpdate(time) {
